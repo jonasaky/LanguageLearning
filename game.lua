@@ -9,7 +9,7 @@ local scene = composer.newScene()
 -- -----------------------------------------------------------------------------------
 
 local mainGroup
-local question, optionA, optionB, optionC, optionD, nextButton, correct, answer, answerText
+local question, optionA, optionB, optionC, optionD, finishButton, correct, answer, answerText
 local randomOrder = {}
 local optionsTable = 
 {
@@ -62,35 +62,17 @@ local optionsTable =
 		image = "glasses.png",
 		answer = "Glasses",
 		question = "めがね"
+	},
+	{
+		image = "leg.png",
+		answer = "Foot, leg",
+		question = "足（あし）"
 	}
 }
 local total = #optionsTable
 local maxNumber = total
 local answersTable = optionsTable
 
-local function evaluateAnswer( event )
-	optionA:removeEventListener( "tap", evaluateAnswer)
-	optionB:removeEventListener( "tap", evaluateAnswer)
-	optionC:removeEventListener( "tap", evaluateAnswer)
-	optionD:removeEventListener( "tap", evaluateAnswer)
-
-	if event.target.isCorrect then
-		correct = display.newText( mainGroup, "Correct!", display.contentCenterX + 80, event.target.y, native.systemFont, 20)
-		correct:setFillColor( .2,1,0)
-	else
-		correct = display.newText( mainGroup, "Incorrect!", display.contentCenterX+ 80, event.target.y, native.systemFont, 20)
-		correct:setFillColor( 1, 0,0)
-		answer = display.newText( mainGroup, answerText, display.contentCenterX, 70, native.systemFont, 20)
-		answer:setFillColor( .2,1,0)
-	end
-
-	if total == 0 then
-		nextButton.text = "Finish"
-	end
-		
-	nextButton.isVisible = true
-	
-end
 
 local function goToMenu()
 	composer.gotoScene("menu", { time=800, effect="crossFade" } )
@@ -106,106 +88,78 @@ local function has_value (tab, val)
     return false
 end
 
+local function shuffling (tab)
+	for i = 1, 10 do
+		local random1 = math.random(#tab)
+		local random2 = math.random(#tab)
+		tab[random1], tab[random2] = tab[random2], tab[random1]
+	end
+end
+
 local function createQuestion()
-	if total == 0 then
-		return goToMenu()
-	end	
 
-	display.remove(question)
-	display.remove( optionA)
-	display.remove( optionB )
-	display.remove( optionC )
-	display.remove( optionD )
-	display.remove ( correct)
-	display.remove ( answer)
-	nextButton.isVisible = false
-
-	-- local j = 1
-	-- while (j <= maxNumber) do
-	-- 	local random1 = math.random(maxNumber)
-	-- 	local random2 = math.random(maxNumber)
-	-- 	optionsTable[random1], optionsTable[random2] = optionsTable[random2], optionsTable[random1]
-	-- 	j = j + 1
-	-- end
-
-	-- print("random number "..randomOrder[1])
+	display.remove ( correct )
 
 	local i = 1
-	local orderDisplayed = {}
-	while i <= 3 do
+	local answersDisplayed = {}
+	while i <= 4 do
 		local n = math.random(maxNumber)
-		if (has_value(orderDisplayed, n) == false) and n ~= randomOrder[1] then
-			-- if (has_value(orderDisplayed, randomOrder[1]) == false) then
-				table.insert(orderDisplayed,n)
-				i = i + 1
-			-- end
+		if (has_value(answersDisplayed, n) == false) and n ~= total then
+			table.insert(answersDisplayed,n)
+			i = i + 1
 		end
 	end
 
-			-- if (has_value(orderDisplayed, randomOrder[1]) == false) then
-			-- 	print("false")
-			-- else
-			-- 	print("true")
-			-- end
-
-	-- for i = 1, #randomOrder, 1 do 
-
-	-- 	print("random"..randomOrder[i])
-	-- end
-
-
-	question = display.newText( mainGroup, optionsTable[randomOrder[1]].question, display.contentCenterX, 120, native.systemFont, 60 )
+	question.text = optionsTable[total].question
 	question:setFillColor( .5, 1, 1)
 	
-	local order = math.random(3)
+	local order = math.random(4)
 	
-	if order == 1 then
-		optionA = display.newText( mainGroup, optionsTable[randomOrder[1]].answer , display.contentCenterX, 280, native.systemFont, 20 )	
-		optionB = display.newText( mainGroup, optionsTable[orderDisplayed[1]].answer , display.contentCenterX, 330, native.systemFont, 20 )	
-		optionC = display.newText( mainGroup, optionsTable[orderDisplayed[2]].answer , display.contentCenterX, 380, native.systemFont, 20 )	
-		optionD = display.newText( mainGroup, optionsTable[orderDisplayed[3]].answer , display.contentCenterX, 430, native.systemFont, 20 )
-		
-	elseif order == 2 then
-		optionA = display.newText( mainGroup, optionsTable[orderDisplayed[1]].answer , display.contentCenterX, 280, native.systemFont, 20 )	
-		optionB = display.newText( mainGroup, optionsTable[randomOrder[1]].answer , display.contentCenterX, 330, native.systemFont, 20 )	
-		optionC = display.newText( mainGroup, optionsTable[orderDisplayed[2]].answer , display.contentCenterX, 380, native.systemFont, 20 )	
-		optionD = display.newText( mainGroup, optionsTable[orderDisplayed[3]].answer , display.contentCenterX, 430, native.systemFont, 20 )
-		
-	elseif order == 3 then
-		optionA = display.newText( mainGroup, optionsTable[orderDisplayed[1]].answer , display.contentCenterX, 280, native.systemFont, 20 )	
-		optionB = display.newText( mainGroup, optionsTable[orderDisplayed[2]].answer , display.contentCenterX, 330, native.systemFont, 20 )	
-		optionC = display.newText( mainGroup, optionsTable[randomOrder[1]].answer , display.contentCenterX, 380, native.systemFont, 20 )	
-		optionD = display.newText( mainGroup, optionsTable[orderDisplayed[3]].answer , display.contentCenterX, 430, native.systemFont, 20 )
-		
-	end
-	--print(order)
-	-- optionA = display.newText( mainGroup, "A)" .. optionsTable[orderDisplayed[1]].answer , display.contentCenterX, 300, native.systemFont, 16 )	
-	-- optionB = display.newText( mainGroup, "B)" .. optionsTable[orderDisplayed[2]].answer , display.contentCenterX, 340, native.systemFont, 16 )	
-	-- optionC = display.newText( mainGroup, "C)" .. optionsTable[orderDisplayed[3]].answer , display.contentCenterX, 380, native.systemFont, 16 )	
-	-- optionD = display.newText( mainGroup, "D)" .. optionsTable[orderDisplayed[4]].answer , display.contentCenterX, 420, native.systemFont, 16 )
+	optionA.text = optionsTable[answersDisplayed[1]].answer
+	optionB.text = optionsTable[answersDisplayed[2]].answer
+	optionC.text = optionsTable[answersDisplayed[3]].answer
+	optionD.text = optionsTable[answersDisplayed[4]].answer
 
-	answerText = optionsTable[randomOrder[1]].answer
 	if order == 1 then
+		optionA.text = optionsTable[total].answer
 		optionA.isCorrect = true
 	elseif order == 2 then
-		optionB.isCorrect = true		
+		optionB.text = optionsTable[total].answer
+		optionB.isCorrect = true
 	elseif order == 3 then
+		optionC.text = optionsTable[total].answer
 		optionC.isCorrect = true
+	else
+		optionD.text = optionsTable[total].answer
+		optionD.isCorrect = true
 	end
 
-	optionA:addEventListener( "tap", evaluateAnswer)
-	optionB:addEventListener( "tap", evaluateAnswer)
-	optionC:addEventListener( "tap", evaluateAnswer)
-	optionD:addEventListener( "tap", evaluateAnswer)
+	answerText = optionsTable[total].answer
 
-	table.remove(randomOrder, 1)
 	total = total - 1
-	-- print("new value total" .. total)
-	-- print("maxvalue" .. maxNumber)
-	-- print(#answersTable)
-	-- print(#optionsTable)
 end
 
+local function evaluateAnswer( event )
+	
+
+	if event.target.isCorrect then
+		correct = display.newText( mainGroup, "Correct!", display.contentCenterX + 90, event.target.y, native.systemFont, 20)
+		correct:setFillColor( .2,1,0)
+
+		if total == 0 then
+			finishButton.isVisible = true
+		else
+			timer.performWithDelay( 100, createQuestion )
+		end
+		
+	else
+		local incorrectText = display.newText( mainGroup, "Incorrect!", display.contentCenterX + 90, event.target.y, native.systemFont, 20)
+		incorrectText:setFillColor( 1, 0,0)
+		timer.performWithDelay( 500, function() display.remove(incorrectText) end )
+		
+	end
+
+end
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -222,28 +176,32 @@ function scene:create( event )
 	
 	local description = display.newText( mainGroup, "Choose the correct translation", display.contentCenterX, 30, 300, 0, native.systemFont, 16 )
 
-	nextButton = display.newText( mainGroup, "Next" , display.contentCenterX, 480, native.systemFont, 20 )	
-	nextButton:setFillColor( .6,.6,1 )
-	nextButton.isVisible = false
+	finishButton = display.newText( mainGroup, "Finish" , display.contentCenterX, 480, native.systemFont, 20 )	
+	finishButton:setFillColor( .6,.6,1 )
+	finishButton.isVisible = false
 
-	local i = 1
-	while i <= #optionsTable do
-		local n = math.random(#optionsTable)
-		if has_value(randomOrder, n) == false then
-			table.insert(randomOrder,n)
-			i = i + 1
-		end
+	shuffling(optionsTable)
+
+	for i = 1, #optionsTable do 
+		print(optionsTable[i].answer)
 	end
 
-	for i = 1, #randomOrder, 1 do 
-
-		print(randomOrder[i])
-	end
-
+	question = display.newText( mainGroup, "", display.contentCenterX, 120, native.systemFont, 60 )
+	question:setFillColor( .5, 1, 1)
+	
+	optionA = display.newText( mainGroup, "" , display.contentCenterX, 280, native.systemFont, 20 )	
+	optionB = display.newText( mainGroup, "" , display.contentCenterX, 330, native.systemFont, 20 )	
+	optionC = display.newText( mainGroup, "" , display.contentCenterX, 380, native.systemFont, 20 )	
+	optionD = display.newText( mainGroup, "" , display.contentCenterX, 430, native.systemFont, 20 )
 
 	createQuestion()
 
-	nextButton:addEventListener( "tap", createQuestion )
+	finishButton:addEventListener( "tap", goToMenu )
+
+	optionA:addEventListener( "tap", evaluateAnswer)
+	optionB:addEventListener( "tap", evaluateAnswer)
+	optionC:addEventListener( "tap", evaluateAnswer)
+	optionD:addEventListener( "tap", evaluateAnswer)
 end
 
 
