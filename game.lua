@@ -9,70 +9,67 @@ local scene = composer.newScene()
 -- -----------------------------------------------------------------------------------
 
 local mainGroup
-local question, optionA, optionB, optionC, optionD, finishButton, correct, answer, answerText
+local question, optionA, optionB, optionC, optionD, finishButton, correct
 local randomOrder = {}
 local optionsTable = 
 {
 	{
 		image = "apple.png",
-		answer = "Apple",
-		question = "りんご"
+		english = "Apple",
+		japanese = "りんご"
 	},
 	{
 		image = "orange.png",
-		answer = "Orange",
-		question = "オレンジ"
+		english = "Orange",
+		japanese = "オレンジ"
 	},
 	{
 		image = "melon.png",
-		answer = "Melon",
-		question = "メロン"
+		english = "Melon",
+		japanese = "メロン"
 	},
 	{
 		image = "ballpen.png",
-		answer = "Ballpen",
-		question = "ボールペン"
+		english = "Ballpen",
+		japanese = "ボールペン"
 	},
 	{
 		image = "flower.png",
-		answer = "Flower",
-		question = "はな"
+		english = "Flower",
+		japanese = "はな"
 	},
 	{
 		image = "tree.png",
-		answer = "Tree",
-		question = "き"
+		english = "Tree",
+		japanese = "き"
 	},
 	{
 		image = "hair.png",
-		answer = "Hair",
-		question = "かみ"
+		english = "Hair",
+		japanese = "かみ"
 	},
 	{
 		image = "head.png",
-		answer = "Head",
-		question = "あたま"
+		english = "Head",
+		japanese = "あたま"
 	},
 	{
 		image = "stomach.png",
-		answer = "Stomach",
-		question = "おなか"
+		english = "Stomach",
+		japanese = "おなか"
 	},
 	{
 		image = "glasses.png",
-		answer = "Glasses",
-		question = "めがね"
+		english = "Glasses",
+		japanese = "めがね"
 	},
 	{
 		image = "leg.png",
-		answer = "Foot, leg",
-		question = "足（あし）"
+		english = "Foot, leg",
+		japanese = "足（あし）"
 	}
 }
 local total = #optionsTable
-local maxNumber = total
-local answersTable = optionsTable
-
 
 local function goToMenu()
 	composer.gotoScene("menu", { time=800, effect="crossFade" } )
@@ -96,46 +93,59 @@ local function shuffling (tab)
 	end
 end
 
-local function createQuestion()
+local function createQuestion(isEnglish)
 
 	display.remove ( correct )
+	optionA.isCorrect = false
+	optionB.isCorrect = false
+	optionC.isCorrect = false
+	optionD.isCorrect = false
 
 	local i = 1
 	local answersDisplayed = {}
 	while i <= 4 do
-		local n = math.random(maxNumber)
+		local n = math.random(#optionsTable)
 		if (has_value(answersDisplayed, n) == false) and n ~= total then
 			table.insert(answersDisplayed,n)
 			i = i + 1
 		end
 	end
 
-	question.text = optionsTable[total].question
+	local answerText
+	if isEnglish == 1 then
+		answerText = optionsTable[total].japanese
+		question.text = optionsTable[total].english
+		optionA.text = optionsTable[answersDisplayed[1]].japanese
+		optionB.text = optionsTable[answersDisplayed[2]].japanese
+		optionC.text = optionsTable[answersDisplayed[3]].japanese
+		optionD.text = optionsTable[answersDisplayed[4]].japanese
+	else
+		answerText = optionsTable[total].english
+		question.text = optionsTable[total].japanese
+		optionA.text = optionsTable[answersDisplayed[1]].english
+		optionB.text = optionsTable[answersDisplayed[2]].english
+		optionC.text = optionsTable[answersDisplayed[3]].english
+		optionD.text = optionsTable[answersDisplayed[4]].english
+	end
+	
 	question:setFillColor( .5, 1, 1)
 	
 	local order = math.random(4)
-	
-	optionA.text = optionsTable[answersDisplayed[1]].answer
-	optionB.text = optionsTable[answersDisplayed[2]].answer
-	optionC.text = optionsTable[answersDisplayed[3]].answer
-	optionD.text = optionsTable[answersDisplayed[4]].answer
 
 	if order == 1 then
-		optionA.text = optionsTable[total].answer
+		optionA.text = answerText
 		optionA.isCorrect = true
 	elseif order == 2 then
-		optionB.text = optionsTable[total].answer
+		optionB.text = answerText
 		optionB.isCorrect = true
 	elseif order == 3 then
-		optionC.text = optionsTable[total].answer
+		optionC.text = answerText
 		optionC.isCorrect = true
 	else
-		optionD.text = optionsTable[total].answer
+		optionD.text = answerText
 		optionD.isCorrect = true
 	end
-
-	answerText = optionsTable[total].answer
-
+	
 	total = total - 1
 end
 
@@ -149,7 +159,7 @@ local function evaluateAnswer( event )
 		if total == 0 then
 			finishButton.isVisible = true
 		else
-			timer.performWithDelay( 100, createQuestion )
+			timer.performWithDelay( 100, function() createQuestion(math.random(2)) end )
 		end
 		
 	else
@@ -182,9 +192,9 @@ function scene:create( event )
 
 	shuffling(optionsTable)
 
-	for i = 1, #optionsTable do 
-		print(optionsTable[i].answer)
-	end
+	-- for i = 1, #optionsTable do 
+	-- 	print(optionsTable[i].answer)
+	-- end
 
 	question = display.newText( mainGroup, "", display.contentCenterX, 120, native.systemFont, 60 )
 	question:setFillColor( .5, 1, 1)
@@ -194,7 +204,7 @@ function scene:create( event )
 	optionC = display.newText( mainGroup, "" , display.contentCenterX, 380, native.systemFont, 20 )	
 	optionD = display.newText( mainGroup, "" , display.contentCenterX, 430, native.systemFont, 20 )
 
-	createQuestion()
+	createQuestion(1)
 
 	finishButton:addEventListener( "tap", goToMenu )
 
