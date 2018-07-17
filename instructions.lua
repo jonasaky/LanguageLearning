@@ -8,15 +8,46 @@ local scene = composer.newScene()
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
-local musicTrack
+local myButton
+local countDown = 3
+local countDownText
 
-local function gotoGame()
-    composer.gotoScene( "instructions", { time=800, effect="crossFade" } )
+local function countDownHandle()
+	if countDown == 1 then 
+		composer.gotoScene("game")
+	else
+		countDown = countDown - 1
+		countDownText.text = countDown	
+	end		
 end
- 
-local function gotoHighScores()
-    composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
-end
+
+-- Create the touch event handler function 
+local function buttonHandler( event )
+
+	if (event.phase == "began") then  
+	
+		myButton.xScale = 0.3 -- Scale the button on touch down so user knows its pressed
+		myButton.yScale = 0.3
+	
+	elseif (event.phase == "moved") then
+	
+		--something
+	
+	elseif (event.phase == "ended" or event.phase == "cancelled") then
+		
+		myButton.xScale = 0.4 -- Re-scale the button on touch release 
+		myButton.yScale = 0.4
+	
+		countDownText.isVisible = true
+		timer.performWithDelay( 600, countDownHandle, 3)
+		-- myButton:removeEventListener("touch", buttonHandler)
+		myButton.isVisible = false
+	
+	end
+	
+	return true
+	
+end 
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -27,22 +58,34 @@ function scene:create( event )
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
-	--local background = display.newImageRect(sceneGroup, "background.png", 950, 1425) -- add a background
-    	--background.x = math.floor(display.contentWidth / 2)
-		--background.y = math.floor( display.contentHeight / 2)
-		
-	local title = display.newText( sceneGroup, "Language Learning", display.contentCenterX, 100, native.systemFont, 34 )
+
+	local titleText = display.newText( sceneGroup, "Description", 10, 0, "Segoe UI", 24 )
+	titleText.anchorX = 0
+	local descriptionText = display.newText( sceneGroup, "This is a multiple choice word translation game. You need to tap the correct answer. " ..
+		"If you fail you can try until you have the correct answer. \nTry to get as many as possible correct answers in 1 minute!!", display.contentCenterX, 120, 300, 0, "Segoe UI", 20)
+
+	local systemFonts = native.getFontNames() 
+	local searchString = "pt"
 	
-	local playButton = display.newText( sceneGroup, "Start", display.contentCenterX, 350, native.systemFont, 24 )
-    --playButton:setFillColor( 0.82, 0.86, 1 )
- 
-    local highScoresButton = display.newText( sceneGroup, "High Scores", display.contentCenterX, 400, native.systemFont, 24 )
-	--highScoresButton:setFillColor( 0.75, 0.78, 1 )
+	for i, fontName in ipairs( systemFonts ) do
+		-- local j, k = string.find( string.lower(fontName), string.lower(searchString) )
+	
+		-- if ( j ~= nil ) then
+			print( "Font Name = " .. tostring( fontName ) )
+		-- end
+	end
 
-	local settingsButton = display.newText( sceneGroup, "Settings", display.contentCenterX, 450, native.systemFont, 24 )
+	countDownText = display.newText(sceneGroup, countDown, display.contentCenterX,display.contentHeight - 100, native.systemFont, 40)
+	countDownText.isVisible = false
 
-	playButton:addEventListener( "tap", gotoGame )
-	--highScoresButton:addEventListener( "tap", gotoHighScores )
+	myButton = display.newImageRect( sceneGroup, "play_btn.png", 552,198)
+	myButton.x = display.contentCenterX
+	myButton.y = display.contentHeight - 100
+	myButton.xScale = 0.4
+	myButton.yScale = 0.4
+
+	myButton:addEventListener("touch",buttonHandler)
+
 end
 
 

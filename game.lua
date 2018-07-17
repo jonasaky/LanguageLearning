@@ -9,7 +9,8 @@ local scene = composer.newScene()
 -- -----------------------------------------------------------------------------------
 
 local mainGroup
-local question, optionA, optionB, optionC, optionD, finishButton, correct
+local question, optionA, optionB, optionC, optionD, finishButton, correct, countDownText
+local countDown = 60
 local randomOrder = {}
 local optionsTable = 
 {
@@ -70,6 +71,32 @@ local optionsTable =
 	}
 }
 local total = #optionsTable
+
+local centiSecondsLeft = 1*6000
+local clockText
+local minutes
+local second
+local centiSeconds
+
+local function updateTime()
+
+    minutes = math.floor(centiSecondsLeft/6000)
+    seconds = math.floor((centiSecondsLeft-(minutes*6000))/100)
+    centiSeconds =((centiSecondsLeft-(minutes*6000))%100)
+	-- clockText.text = string.format("%02d:%02d:%02d", minutes, seconds, centiSeconds)
+	clockText.text = string.format("%02d:%02d", seconds, centiSeconds)
+    centiSecondsLeft = centiSecondsLeft - 1
+
+end
+
+local function countDownHandle()
+	countDown = countDown - 1
+	countDownText.text = countDown
+
+	if countDown == 0 then
+		--show finish button and stop the game
+	end
+end
 
 local function goToMenu()
 	composer.gotoScene("menu", { time=800, effect="crossFade" } )
@@ -184,7 +211,10 @@ function scene:create( event )
 	mainGroup = display.newGroup() 
 	sceneGroup:insert( mainGroup ) 
 	
-	local description = display.newText( mainGroup, "Choose the correct translation", display.contentCenterX, 30, 300, 0, native.systemFont, 16 )
+	countDownText = display.newText( mainGroup, countDown, display.contentWidth - 10, 10, native.systemFont, 20)
+	timer.performWithDelay( 1000, countDownHandle, 60 )
+	timer.performWithDelay(10, updateTime, centiSecondsLeft)
+	clockText = display.newText(mainGroup, "", display.contentCenterX, 10, native.systemFont, 40)
 
 	finishButton = display.newText( mainGroup, "Finish" , display.contentCenterX, 480, native.systemFont, 20 )	
 	finishButton:setFillColor( .6,.6,1 )
