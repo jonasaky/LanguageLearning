@@ -3,73 +3,77 @@ local composer = require( "composer" )
 
 local scene = composer.newScene()
 
+local loadsave = require("loadsave")
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
 local mainGroup
-local question, optionA, optionB, optionC, optionD, finishButton, correct, countDownText
-local countDown = 60
+local question, optionA, optionB, optionC, optionD, finishButton, correct
+local score = 0
 local randomOrder = {}
-local optionsTable = 
-{
+local optionsTable = loadsave.loadTable("words.json", system.ResourceDirectory)
+if optionsTable == nil then
+	optionsTable = 
 	{
-		image = "apple.png",
-		english = "Apple",
-		japanese = "りんご"
-	},
-	{
-		image = "orange.png",
-		english = "Orange",
-		japanese = "オレンジ"
-	},
-	{
-		image = "melon.png",
-		english = "Melon",
-		japanese = "メロン"
-	},
-	{
-		image = "ballpen.png",
-		english = "Ballpen",
-		japanese = "ボールペン"
-	},
-	{
-		image = "flower.png",
-		english = "Flower",
-		japanese = "はな"
-	},
-	{
-		image = "tree.png",
-		english = "Tree",
-		japanese = "き"
-	},
-	{
-		image = "hair.png",
-		english = "Hair",
-		japanese = "かみ"
-	},
-	{
-		image = "head.png",
-		english = "Head",
-		japanese = "あたま"
-	},
-	{
-		image = "stomach.png",
-		english = "Stomach",
-		japanese = "おなか"
-	},
-	{
-		image = "glasses.png",
-		english = "Glasses",
-		japanese = "めがね"
-	},
-	{
-		image = "leg.png",
-		english = "Foot, leg",
-		japanese = "足（あし）"
+		{
+			image = "apple.png",
+			english = "Apple",
+			japanese = "りんご"
+		},
+		{
+			image = "orange.png",
+			english = "Orange",
+			japanese = "オレンジ"
+		},
+		{
+			image = "melon.png",
+			english = "Melon",
+			japanese = "メロン"
+		},
+		{
+			image = "ballpen.png",
+			english = "Ballpen",
+			japanese = "ボールペン"
+		},
+		{
+			image = "flower.png",
+			english = "Flower",
+			japanese = "はな"
+		},
+		{
+			image = "tree.png",
+			english = "Tree",
+			japanese = "き"
+		},
+		{
+			image = "hair.png",
+			english = "Hair",
+			japanese = "かみ"
+		},
+		{
+			image = "head.png",
+			english = "Head",
+			japanese = "あたま"
+		},
+		{
+			image = "stomach.png",
+			english = "Stomach",
+			japanese = "おなか"
+		},
+		{
+			image = "glasses.png",
+			english = "Glasses",
+			japanese = "めがね"
+		},
+		{
+			image = "leg.png",
+			english = "Foot, leg",
+			japanese = "足（あし）"
+		}
 	}
-}
+end
 local total = #optionsTable
 
 local centiSecondsLeft = 1*6000
@@ -85,17 +89,26 @@ local function updateTime()
     centiSeconds =((centiSecondsLeft-(minutes*6000))%100)
 	-- clockText.text = string.format("%02d:%02d:%02d", minutes, seconds, centiSeconds)
 	clockText.text = string.format("%02d:%02d", seconds, centiSeconds)
-    centiSecondsLeft = centiSecondsLeft - 1
+	centiSecondsLeft = centiSecondsLeft - 1
+	
+	if centiSecondsLeft == 0 then
+		display.remove(clockText)
+		display.remove(question)
+		display.remove(optionA)
+		display.remove(optionB)
+		display.remove(optionC)
+		display.remove(optionD)
+		local resultTitle = display.newText(mainGroup, "Let's try better next time!", display.contentCenterX, 100, display.contentWidth - 100, 0, "Segoe UI", 32)
+		local scoreResult = display.newText(mainGroup, "Your score is " .. score, display.contentCenterX, 160, "Segoe UI", 36)
 
-end
-
-local function countDownHandle()
-	countDown = countDown - 1
-	countDownText.text = countDown
-
-	if countDown == 0 then
-		--show finish button and stop the game
+		if score > playerData.bestScore then
+			resultTitle.text = "New highscore!"
+			playerData.bestScore = score
+			loadsave.saveTable(playerData, "playerData.json")
+		end
+		finishButton.isVisible = true
 	end
+
 end
 
 local function goToMenu()
@@ -180,7 +193,8 @@ local function evaluateAnswer( event )
 	
 
 	if event.target.isCorrect then
-		correct = display.newText( mainGroup, "Correct!", display.contentCenterX + 90, event.target.y, native.systemFont, 20)
+		score = score + 1
+		correct = display.newText( mainGroup, "Correct!", display.contentCenterX + 120, event.target.y, native.systemFont, 16)
 		correct:setFillColor( .2,1,0)
 
 		if total == 0 then
@@ -190,7 +204,7 @@ local function evaluateAnswer( event )
 		end
 		
 	else
-		local incorrectText = display.newText( mainGroup, "Incorrect!", display.contentCenterX + 90, event.target.y, native.systemFont, 20)
+		local incorrectText = display.newText( mainGroup, "Incorrect!", display.contentCenterX + 120, event.target.y, native.systemFont, 16)
 		incorrectText:setFillColor( 1, 0,0)
 		timer.performWithDelay( 500, function() display.remove(incorrectText) end )
 		
@@ -207,12 +221,10 @@ function scene:create( event )
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
-
+	-- loadsave.saveTable(optionsTable, "words.json")
 	mainGroup = display.newGroup() 
 	sceneGroup:insert( mainGroup ) 
 	
-	countDownText = display.newText( mainGroup, countDown, display.contentWidth - 10, 10, native.systemFont, 20)
-	timer.performWithDelay( 1000, countDownHandle, 60 )
 	timer.performWithDelay(10, updateTime, centiSecondsLeft)
 	clockText = display.newText(mainGroup, "", display.contentCenterX, 10, native.systemFont, 40)
 
@@ -226,13 +238,30 @@ function scene:create( event )
 	-- 	print(optionsTable[i].answer)
 	-- end
 
-	question = display.newText( mainGroup, "", display.contentCenterX, 120, native.systemFont, 60 )
+	local options = 
+	{
+		parent = mainGroup,
+		text = "",     
+		x = display.contentCenterX,
+		y = 120,
+		width = display.actualContentWidth,
+		font = native.systemFont,   
+		fontSize = 40,
+		align = "center"  -- Alignment parameter
+	}
+	question = display.newText( options )
+	-- question.anchorX = 0
+	-- question.align = "center"
 	question:setFillColor( .5, 1, 1)
 	
 	optionA = display.newText( mainGroup, "" , display.contentCenterX, 280, native.systemFont, 20 )	
+	-- optionA.anchorX = 0
 	optionB = display.newText( mainGroup, "" , display.contentCenterX, 330, native.systemFont, 20 )	
+	-- optionB.anchorX = 0
 	optionC = display.newText( mainGroup, "" , display.contentCenterX, 380, native.systemFont, 20 )	
+	-- optionC.anchorX = 0
 	optionD = display.newText( mainGroup, "" , display.contentCenterX, 430, native.systemFont, 20 )
+	-- optionD.anchorX = 0
 
 	createQuestion(1)
 

@@ -26,8 +26,8 @@ local function buttonHandler( event )
 
 	if (event.phase == "began") then  
 	
-		myButton.xScale = 0.3 -- Scale the button on touch down so user knows its pressed
-		myButton.yScale = 0.3
+		myButton.xScale = 0.35 -- Scale the button on touch down so user knows its pressed
+		myButton.yScale = 0.35
 	
 	elseif (event.phase == "moved") then
 	
@@ -62,18 +62,18 @@ function scene:create( event )
 	local titleText = display.newText( sceneGroup, "Description", 10, 0, "Segoe UI", 24 )
 	titleText.anchorX = 0
 	local descriptionText = display.newText( sceneGroup, "This is a multiple choice word translation game. You need to tap the correct answer. " ..
-		"If you fail you can try until you have the correct answer. \nTry to get as many as possible correct answers in 1 minute!!", display.contentCenterX, 120, 300, 0, "Segoe UI", 20)
+		"If you fail you can try again until you have the correct answer. \nTry to get as many as possible correct answers in 1 minute!!", display.contentCenterX, 120, 300, 0, "Segoe UI", 20)
 
-	local systemFonts = native.getFontNames() 
-	local searchString = "pt"
+	-- local systemFonts = native.getFontNames() 
+	-- local searchString = "pt"
 	
-	for i, fontName in ipairs( systemFonts ) do
-		-- local j, k = string.find( string.lower(fontName), string.lower(searchString) )
+	-- for i, fontName in ipairs( systemFonts ) do
+	-- 	local j, k = string.find( string.lower(fontName), string.lower(searchString) )
 	
-		-- if ( j ~= nil ) then
-			print( "Font Name = " .. tostring( fontName ) )
-		-- end
-	end
+	-- 	if ( j ~= nil ) then
+	-- 		print( "Font Name = " .. tostring( fontName ) )
+	-- 	end
+	-- end
 
 	countDownText = display.newText(sceneGroup, countDown, display.contentCenterX,display.contentHeight - 100, native.systemFont, 40)
 	countDownText.isVisible = false
@@ -116,7 +116,7 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
-
+		composer.removeScene( "instructions" )
 	end
 end
 
