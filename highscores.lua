@@ -18,10 +18,6 @@ local function gotoHighScores()
     composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
 end
 
-local function gotoSettings()
-	composer.gotoScene("settings", {time=800, effect="crossFade"})
-end
-
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -34,20 +30,8 @@ function scene:create( event )
 	--local background = display.newImageRect(sceneGroup, "background.png", 950, 1425) -- add a background
     	--background.x = math.floor(display.contentWidth / 2)
 		--background.y = math.floor( display.contentHeight / 2)
-		
-	local title = display.newText( sceneGroup, "Language Learning", display.contentCenterX, 100, native.systemFont, 34 )
-	
-	local playButton = display.newText( sceneGroup, "Start", display.contentCenterX, 350, native.systemFont, 24 )
-    --playButton:setFillColor( 0.82, 0.86, 1 )
- 
-    local highScoresButton = display.newText( sceneGroup, "High Scores", display.contentCenterX, 400, native.systemFont, 24 )
-	--highScoresButton:setFillColor( 0.75, 0.78, 1 )
-
-	local settingsButton = display.newText( sceneGroup, "Settings", display.contentCenterX, 450, native.systemFont, 24 )
-
-	playButton:addEventListener( "tap", gotoGame )
-	highScoresButton:addEventListener( "tap", gotoHighScores )
-	settingsButton:addEventListener("tap", gotoSettings)
+    
+    local highscoresText = display.newText(sceneGroup, "Highscores", display.contentCenterX, 0, native.SystemFont, 40)
 end
 
 

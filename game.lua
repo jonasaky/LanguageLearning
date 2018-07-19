@@ -10,12 +10,14 @@ local loadsave = require("loadsave")
 -- -----------------------------------------------------------------------------------
 
 local mainGroup
-local question, optionA, optionB, optionC, optionD, finishButton, correct
+local question, optionA, optionB, optionC, optionD, finishButton, correct, scoreText
 local score = 0
 local randomOrder = {}
-local optionsTable = loadsave.loadTable("words.json", system.ResourceDirectory)
-if optionsTable == nil then
-	optionsTable = 
+local wordsTable
+local total
+
+if wordsTable == nil then
+	wordsTable = 
 	{
 		{
 			image = "apple.png",
@@ -74,7 +76,6 @@ if optionsTable == nil then
 		}
 	}
 end
-local total = #optionsTable
 
 local centiSecondsLeft = 1*6000
 local clockText
@@ -98,7 +99,7 @@ local function updateTime()
 		display.remove(optionB)
 		display.remove(optionC)
 		display.remove(optionD)
-		local resultTitle = display.newText(mainGroup, "Let's try better next time!", display.contentCenterX, 100, display.contentWidth - 100, 0, "Segoe UI", 32)
+		local resultTitle = display.newText(mainGroup, "Great job!", display.contentCenterX, 100, display.contentWidth - 100, 0, "Segoe UI", 32)
 		local scoreResult = display.newText(mainGroup, "Your score is " .. score, display.contentCenterX, 160, "Segoe UI", 36)
 
 		if score > playerData.bestScore then
@@ -109,6 +110,38 @@ local function updateTime()
 		finishButton.isVisible = true
 	end
 
+end
+
+local function joinTables(t1, t2)
+
+	for k,v in ipairs(t2) do
+	   table.insert(t1, v)
+	end 
+ 
+	return t1
+ end
+
+local function loadWords()
+	local category = composer.getVariable( "selectedCategory" )
+	if category == "Jr High 1 year Noun" then
+		wordsTable = loadsave.loadTable("jrhigh1year_noun.json", system.ResourceDirectory)
+	elseif category == "Jr High 1 year Verb" then
+		wordsTable = loadsave.loadTable("jrhigh1year_verb.json", system.ResourceDirectory)
+	elseif category == "Jr High 1 year Adj & Adv" then
+		wordsTable = loadsave.loadTable("jrhigh1year_adjadv.json", system.ResourceDirectory)
+	elseif category == "Jr High 2 year Noun" then
+		wordsTable = loadsave.loadTable("jrhigh2year_noun.json", system.ResourceDirectory)
+	elseif category == "Jr High 2 year Verb" then
+		wordsTable = loadsave.loadTable("jrhigh2year_verb.json", system.ResourceDirectory)
+	elseif category == "Jr High 2 year Adj" then
+		wordsTable = loadsave.loadTable("jrhigh2year_adj.json", system.ResourceDirectory)
+	elseif category == "Jr High 3 year Noun" then
+		wordsTable = loadsave.loadTable("jrhigh3year_noun.json", system.ResourceDirectory)
+	elseif category == "Jr High 3 year Verb" then
+		wordsTable = loadsave.loadTable("jrhigh3year_verb.json", system.ResourceDirectory)
+	elseif category == "Jr High 3 year Adj & Adv" then
+		wordsTable = loadsave.loadTable("jrhigh3year_adjadv.json", system.ResourceDirectory)
+	end
 end
 
 local function goToMenu()
@@ -126,7 +159,7 @@ local function has_value (tab, val)
 end
 
 local function shuffling (tab)
-	for i = 1, 10 do
+	for i = 1, 100 do
 		local random1 = math.random(#tab)
 		local random2 = math.random(#tab)
 		tab[random1], tab[random2] = tab[random2], tab[random1]
@@ -144,7 +177,7 @@ local function createQuestion(isEnglish)
 	local i = 1
 	local answersDisplayed = {}
 	while i <= 4 do
-		local n = math.random(#optionsTable)
+		local n = math.random(#wordsTable)
 		if (has_value(answersDisplayed, n) == false) and n ~= total then
 			table.insert(answersDisplayed,n)
 			i = i + 1
@@ -153,19 +186,19 @@ local function createQuestion(isEnglish)
 
 	local answerText
 	if isEnglish == 1 then
-		answerText = optionsTable[total].japanese
-		question.text = optionsTable[total].english
-		optionA.text = optionsTable[answersDisplayed[1]].japanese
-		optionB.text = optionsTable[answersDisplayed[2]].japanese
-		optionC.text = optionsTable[answersDisplayed[3]].japanese
-		optionD.text = optionsTable[answersDisplayed[4]].japanese
+		answerText = wordsTable[total].japanese
+		question.text = wordsTable[total].english
+		optionA.text = wordsTable[answersDisplayed[1]].japanese
+		optionB.text = wordsTable[answersDisplayed[2]].japanese
+		optionC.text = wordsTable[answersDisplayed[3]].japanese
+		optionD.text = wordsTable[answersDisplayed[4]].japanese
 	else
-		answerText = optionsTable[total].english
-		question.text = optionsTable[total].japanese
-		optionA.text = optionsTable[answersDisplayed[1]].english
-		optionB.text = optionsTable[answersDisplayed[2]].english
-		optionC.text = optionsTable[answersDisplayed[3]].english
-		optionD.text = optionsTable[answersDisplayed[4]].english
+		answerText = wordsTable[total].english
+		question.text = wordsTable[total].japanese
+		optionA.text = wordsTable[answersDisplayed[1]].english
+		optionB.text = wordsTable[answersDisplayed[2]].english
+		optionC.text = wordsTable[answersDisplayed[3]].english
+		optionD.text = wordsTable[answersDisplayed[4]].english
 	end
 	
 	question:setFillColor( .5, 1, 1)
@@ -194,7 +227,8 @@ local function evaluateAnswer( event )
 
 	if event.target.isCorrect then
 		score = score + 1
-		correct = display.newText( mainGroup, "Correct!", display.contentCenterX + 120, event.target.y, native.systemFont, 16)
+		scoreText.text = "current: " .. score
+		correct = display.newText( mainGroup, "✔", event.target.x + 40, event.target.y, native.systemFont, 24)
 		correct:setFillColor( .2,1,0)
 
 		if total == 0 then
@@ -204,7 +238,7 @@ local function evaluateAnswer( event )
 		end
 		
 	else
-		local incorrectText = display.newText( mainGroup, "Incorrect!", display.contentCenterX + 120, event.target.y, native.systemFont, 16)
+		local incorrectText = display.newText( mainGroup, "✘", event.target.x + 40, event.target.y, native.systemFont, 24)
 		incorrectText:setFillColor( 1, 0,0)
 		timer.performWithDelay( 500, function() display.remove(incorrectText) end )
 		
@@ -221,22 +255,28 @@ function scene:create( event )
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
-	-- loadsave.saveTable(optionsTable, "words.json")
+	-- loadsave.saveTable(wordsTable, "words.json")
 	mainGroup = display.newGroup() 
 	sceneGroup:insert( mainGroup ) 
 	
 	timer.performWithDelay(10, updateTime, centiSecondsLeft)
 	clockText = display.newText(mainGroup, "", display.contentCenterX, 10, native.systemFont, 40)
 
+	scoreText = display.newText(mainGroup, "current: " .. score, 50, 0, native.systemFont, 20)
+
 	finishButton = display.newText( mainGroup, "Finish" , display.contentCenterX, 480, native.systemFont, 20 )	
 	finishButton:setFillColor( .6,.6,1 )
 	finishButton.isVisible = false
 
-	shuffling(optionsTable)
-
-	-- for i = 1, #optionsTable do 
-	-- 	print(optionsTable[i].answer)
+	-- joinTables(wordsTable, nounTable)
+	loadWords()
+	shuffling(wordsTable)
+	
+	-- for i = 1, #wordsTable do 
+	-- 	print(wordsTable[i].english)
 	-- end
+
+	total = #wordsTable
 
 	local options = 
 	{

@@ -3,6 +3,7 @@ local composer = require( "composer" )
 
 local scene = composer.newScene()
 
+local widget = require( "widget" )
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -11,6 +12,18 @@ local scene = composer.newScene()
 local myButton
 local countDown = 3
 local countDownText
+local pickerWheel
+
+local columnData = 
+{ 
+	{ 
+		align = "center",
+		width = display.contentWidth * 0.8,
+		labelPadding = 20,
+		startIndex = 3,
+		labels = { "Jr High 1 year Noun", "Jr High 1 year Verb", "Jr High 1 year Adj & Adv", "Jr High 2 year Noun", "Jr High 2 year Verb", "Jr High 2 year Adj", "Jr High 3 year Noun", "Jr High 3 year Verb", "Jr High 3 year Adj & Adv" }
+	}
+}
 
 local function countDownHandle()
 	if countDown == 1 then 
@@ -43,6 +56,10 @@ local function buttonHandler( event )
 		-- myButton:removeEventListener("touch", buttonHandler)
 		myButton.isVisible = false
 	
+		local values = pickerWheel:getValues()
+		local selectedCategory = values[1].value
+		print(selectedCategory)
+		composer.setVariable( "selectedCategory", selectedCategory )
 	end
 	
 	return true
@@ -74,13 +91,25 @@ function scene:create( event )
 	-- 		print( "Font Name = " .. tostring( fontName ) )
 	-- 	end
 	-- end
+	local selectionText = display.newText( sceneGroup, "Please select one category:", display.contentCenterX, 250, native.systemFont, 16)	
+	pickerWheel = widget.newPickerWheel(
+	{
+		left = display.contentWidth - display.contentWidth * 0.9,
+		top = 260,
+		columns = columnData,
+		style = "resizable",
+		width = display.contentWidth * 0.8,
+		rowHeight = 24,
+		fontSize = 14
+	})
+	sceneGroup:insert(pickerWheel)
 
-	countDownText = display.newText(sceneGroup, countDown, display.contentCenterX,display.contentHeight - 100, native.systemFont, 40)
+	countDownText = display.newText(sceneGroup, countDown, display.contentCenterX,display.contentHeight - 10, native.systemFont, 40)
 	countDownText.isVisible = false
 
 	myButton = display.newImageRect( sceneGroup, "play_btn.png", 552,198)
 	myButton.x = display.contentCenterX
-	myButton.y = display.contentHeight - 100
+	myButton.y = display.contentHeight - 10
 	myButton.xScale = 0.4
 	myButton.yScale = 0.4
 
