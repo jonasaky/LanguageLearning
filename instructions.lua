@@ -100,7 +100,9 @@ function scene:create( event )
 		style = "resizable",
 		width = display.contentWidth * 0.8,
 		rowHeight = 24,
-		fontSize = 14
+		fontSize = 14,
+		columnColor = { 0.2, 0.2, 0.2 },
+		fontColorSelected = { 1, 1, 1 }
 	})
 	sceneGroup:insert(pickerWheel)
 
