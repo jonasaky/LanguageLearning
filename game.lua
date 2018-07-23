@@ -4,6 +4,7 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 local loadsave = require("loadsave")
+playerData = loadsave.loadTable("playerData.json")
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -14,6 +15,7 @@ local question, optionA, optionB, optionC, optionD, finishButton, correct, score
 local score = 0
 local randomOrder = {}
 local wordsTable
+local progressBar
 local total
 
 if wordsTable == nil then
@@ -99,8 +101,11 @@ local function updateTime()
 		display.remove(optionB)
 		display.remove(optionC)
 		display.remove(optionD)
+		display.remove(scoreText)
 		local resultTitle = display.newText(mainGroup, "Great job!", display.contentCenterX, 100, display.contentWidth - 100, 0, "Segoe UI", 32)
+		resultTitle:setFillColor(0.5,0.5,0.5)
 		local scoreResult = display.newText(mainGroup, "Your score is " .. score, display.contentCenterX, 160, "Segoe UI", 36)
+		scoreResult:setFillColor(0.5,0.5,0.5)
 
 		if score > playerData.bestScore then
 			resultTitle.text = "New highscore!"
@@ -109,6 +114,8 @@ local function updateTime()
 		end
 		finishButton.isVisible = true
 	end
+
+	progressBar.width = progressBar.width - 0.054
 
 end
 
@@ -201,8 +208,6 @@ local function createQuestion(isEnglish)
 		optionD.text = wordsTable[answersDisplayed[4]].english
 	end
 	
-	question:setFillColor( .5, 1, 1)
-	
 	local order = math.random(4)
 
 	if order == 1 then
@@ -258,11 +263,23 @@ function scene:create( event )
 	-- loadsave.saveTable(wordsTable, "words.json")
 	mainGroup = display.newGroup() 
 	sceneGroup:insert( mainGroup ) 
+
+	-- local background = display.newImageRect(mainGroup, "background.png", 950, 1425) -- add a background
+    -- 	background.x = math.floor(display.contentWidth / 2)
+	-- 	background.y = math.floor( display.contentHeight / 2)
+	local backcolor = display.newRect( mainGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
+	backcolor:setFillColor( 1, 0.85, 0.6 )
+
+	progressBar = display.newRect(mainGroup, 0, 0, display.contentWidth, 5)
+	progressBar.anchorX = 0
+	progressBar:setFillColor(1,0.2,0.2)
 	
 	timer.performWithDelay(10, updateTime, centiSecondsLeft)
 	clockText = display.newText(mainGroup, "", display.contentCenterX, 10, native.systemFont, 40)
+	clockText.isVisible = false
 
-	scoreText = display.newText(mainGroup, "current: " .. score, 50, 0, native.systemFont, 20)
+	scoreText = display.newText(mainGroup, "current: " .. score, 50, display.contentHeight, native.systemFont, 14)
+	scoreText:setFillColor(0.5,0.5,0.5)
 
 	finishButton = display.newText( mainGroup, "Finish" , display.contentCenterX, 480, native.systemFont, 20 )	
 	finishButton:setFillColor( .6,.6,1 )
@@ -292,15 +309,19 @@ function scene:create( event )
 	question = display.newText( options )
 	-- question.anchorX = 0
 	-- question.align = "center"
-	question:setFillColor( .5, 1, 1)
+	question:setFillColor( 1, 0.5, 0)
 	
 	optionA = display.newText( mainGroup, "" , display.contentCenterX, 280, native.systemFont, 20 )	
+	optionA:setFillColor(0.5,0.5,0.5)
 	-- optionA.anchorX = 0
 	optionB = display.newText( mainGroup, "" , display.contentCenterX, 330, native.systemFont, 20 )	
+	optionB:setFillColor(0.5,0.5,0.5)
 	-- optionB.anchorX = 0
 	optionC = display.newText( mainGroup, "" , display.contentCenterX, 380, native.systemFont, 20 )	
+	optionC:setFillColor(0.5,0.5,0.5)
 	-- optionC.anchorX = 0
 	optionD = display.newText( mainGroup, "" , display.contentCenterX, 430, native.systemFont, 20 )
+	optionD:setFillColor(0.5,0.5,0.5)
 	-- optionD.anchorX = 0
 
 	createQuestion(1)

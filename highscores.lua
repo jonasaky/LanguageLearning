@@ -3,6 +3,9 @@ local composer = require( "composer" )
 
 local scene = composer.newScene()
 
+local loadsave = require("loadsave")
+playerData = loadsave.loadTable("playerData.json")
+
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -10,12 +13,8 @@ local scene = composer.newScene()
 
 local musicTrack
 
-local function gotoGame()
-    composer.gotoScene( "instructions", { time=800, effect="crossFade" } )
-end
- 
-local function gotoHighScores()
-    composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
+local function gotoMenu()
+    composer.gotoScene( "menu", { time=600, effect="crossFade" } )
 end
 
 -- -----------------------------------------------------------------------------------
@@ -27,11 +26,22 @@ function scene:create( event )
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
-	--local background = display.newImageRect(sceneGroup, "background.png", 950, 1425) -- add a background
-    	--background.x = math.floor(display.contentWidth / 2)
-		--background.y = math.floor( display.contentHeight / 2)
+	-- local background = display.newImageRect(sceneGroup, "background.png", 800, 1400) -- add a background
+    -- 	background.x = math.floor(display.contentWidth / 2)
+	-- 	background.y = math.floor( display.contentHeight / 2)
+	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
+	backcolor:setFillColor( 1, 0.85, 0.6 )
     
-    local highscoresText = display.newText(sceneGroup, "Highscores", display.contentCenterX, 0, native.SystemFont, 40)
+	local highscoresText = display.newText(sceneGroup, "Highscores", display.contentCenterX, 0, native.SystemFont, 40)
+	highscoresText:setFillColor(0.5,0.5,0.5)
+	
+	local yourScoreText = display.newText(sceneGroup, "countdown score: " .. playerData.bestScore, display.contentCenterX, 100, native.SystemFont, 26)
+	yourScoreText:setFillColor(0.5,0.5,0.5)
+
+	local goBackButton = display.newText(sceneGroup, "Go Back", display.contentCenterX, display.contentHeight, native.SystemFont, 30)
+	goBackButton:setFillColor( .6,.6,1 )
+
+	goBackButton:addEventListener("tap", gotoMenu)
 end
 
 
@@ -62,7 +72,7 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
-
+		composer.removeScene( "highscores" )
 	end
 end
 

@@ -25,6 +25,7 @@ playerData = loadsave.loadTable("playerData.json") -- try to load the initial da
 if(playerData == nil) then 
 	newPlayer = {}
 	newPlayer["bestScore"] = 0
+	newPlayer["username"] = "user" .. math.random(1000, 9999)
 	loadsave.saveTable(newPlayer, "playerData.json")
 end
 

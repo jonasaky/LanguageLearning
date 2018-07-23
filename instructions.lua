@@ -75,12 +75,18 @@ function scene:create( event )
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
+	-- local background = display.newImageRect(sceneGroup, "background.png", 950, 1425) -- add a background
+    -- 	background.x = math.floor(display.contentWidth / 2)
+	-- 	background.y = math.floor( display.contentHeight / 2)
+	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
+	backcolor:setFillColor( 1, 0.85, 0.6 )
 
 	local titleText = display.newText( sceneGroup, "Description", 10, 0, "Segoe UI", 24 )
 	titleText.anchorX = 0
+	titleText:setFillColor(0.5,0.5,0.5)
 	local descriptionText = display.newText( sceneGroup, "This is a multiple choice word translation game. You need to tap the correct answer. " ..
 		"If you fail you can try again until you have the correct answer. \nTry to get as many as possible correct answers in 1 minute!!", display.contentCenterX, 120, 300, 0, "Segoe UI", 20)
-
+	descriptionText:setFillColor(0.5,0.5,0.5)
 	-- local systemFonts = native.getFontNames() 
 	-- local searchString = "pt"
 	
@@ -92,6 +98,7 @@ function scene:create( event )
 	-- 	end
 	-- end
 	local selectionText = display.newText( sceneGroup, "Please select one category:", display.contentCenterX, 250, native.systemFont, 16)	
+	selectionText:setFillColor(0.5,0.5,0.5)
 	pickerWheel = widget.newPickerWheel(
 	{
 		left = display.contentWidth - display.contentWidth * 0.9,
@@ -100,13 +107,14 @@ function scene:create( event )
 		style = "resizable",
 		width = display.contentWidth * 0.8,
 		rowHeight = 24,
-		fontSize = 14,
-		columnColor = { 0.2, 0.2, 0.2 },
-		fontColorSelected = { 1, 1, 1 }
+		fontSize = 14
+		-- columnColor = { 0.2, 0.2, 0.2 },
+		-- fontColorSelected = { 1, 1, 1 }
 	})
 	sceneGroup:insert(pickerWheel)
 
 	countDownText = display.newText(sceneGroup, countDown, display.contentCenterX,display.contentHeight - 10, native.systemFont, 40)
+	countDownText:setFillColor(0.5,0.5,0.5)
 	countDownText.isVisible = false
 
 	myButton = display.newImageRect( sceneGroup, "play_btn.png", 552,198)
