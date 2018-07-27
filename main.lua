@@ -24,7 +24,7 @@ playerData = loadsave.loadTable("playerData.json") -- try to load the initial da
 -- If data doesn't exist, create it!
 if(playerData == nil) then 
 	newPlayer = {}
-	newPlayer["bestScore"] = 0
+	newPlayer["scores"] = {0,0,0,0,0,0,0,0,0}
 	newPlayer["username"] = "user" .. math.random(1000, 9999)
 	loadsave.saveTable(newPlayer, "playerData.json")
 end

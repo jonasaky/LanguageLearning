@@ -33,12 +33,36 @@ local function textListener( event )
 	end
 end
 
-local function gotoMenu()
+-- local function gotoMenu()
 	
-	loadsave.saveTable(playerData, "playerData.json")
-    composer.gotoScene( "menu", { time=600, effect="crossFade" } )
-end
+-- 	loadsave.saveTable(playerData, "playerData.json")
+--     composer.gotoScene( "menu", { time=600, effect="crossFade" } )
+-- end
 
+local function buttonHandler( event )
+
+	if (event.phase == "began") then  
+	
+		event.target.xScale = 0.85 -- Scale the button on touch down so user knows its pressed
+		event.target.yScale = 0.85
+	
+	elseif (event.phase == "moved") then
+	
+		--something
+	
+	elseif (event.phase == "ended" or event.phase == "cancelled") then
+		
+		event.target.xScale = 1 -- Re-scale the button on touch release 
+		event.target.yScale = 1
+
+		loadsave.saveTable(playerData, "playerData.json")
+		composer.gotoScene( "menu", { time=600, effect="crossFade" } )
+		
+	end
+	
+	return true
+	
+end 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -54,24 +78,32 @@ function scene:create( event )
 	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
 	backcolor:setFillColor( 1, 0.85, 0.6 )
     
-	local settingsText = display.newText(sceneGroup, "Settings", display.contentCenterX, 0, native.SystemFont, 40)
-	settingsText:setFillColor(0.5,0.5,0.5)
+	local settingsText = display.newText(sceneGroup, "Settings", display.contentCenterX, 0, "CHOWFUN_.ttf", 40)
+	local gradient = {
+		type="gradient",
+		color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
+	}
+	settingsText:setFillColor(gradient)
 
-	local nickNameLabel = display.newText(sceneGroup, "Your nickname:", display.contentCenterX, 100, native.SystemFont, 24)
-	nickNameLabel:setFillColor(0.5,0.5,0.5)
+	local nickNameLabel = display.newText(sceneGroup, "Your nickname:", display.contentCenterX, 100, "CHOWFUN_.ttf", 24)
+	nickNameLabel:setFillColor(0.8,0.4,0.1)
 	
 	-- Create text field
+	local customFont = native.newFont( "CHOWFUN_.ttf", 16 )
 	defaultField = native.newTextField( display.contentCenterX, 150, 180, 30 )
 	-- defaultField.hasBackground = false
 	-- defaultField:setTextColor( 0.8, 0.8, 0.8 )
 	defaultField:addEventListener( "userInput", textListener )
 	defaultField.text = playerData.username
+	defaultField.font = customFont
 	sceneGroup:insert(defaultField)
 	
-	local goBackButton = display.newText(sceneGroup, "Go Back", display.contentCenterX, display.contentHeight, native.SystemFont, 30)
-	goBackButton:setFillColor( .6,.6,1 )
+	-- local goBackButton = display.newText(sceneGroup, "Go Back", display.contentCenterX, display.contentHeight, native.SystemFont, 30)
+	-- goBackButton:setFillColor( .6,.6,1 )
+	local goBackButton = display.newImageRect(sceneGroup, "backBtn.png", 174, 63)
+	goBackButton.x, goBackButton.y = display.contentCenterX, display.contentHeight
 
-	goBackButton:addEventListener("tap", gotoMenu)
+	goBackButton:addEventListener("touch", buttonHandler)
 end
 
 

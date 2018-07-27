@@ -10,18 +10,47 @@ local scene = composer.newScene()
 
 local musicTrack
 
-local function gotoGame()
-    composer.gotoScene( "instructions", { time=800, effect="crossFade" } )
-end
+-- local function gotoGame()
+--     composer.gotoScene( "instructions", { time=800, effect="crossFade" } )
+-- end
  
-local function gotoHighScores()
-    composer.gotoScene( "highscores", { time=800, effect="crossFade" } )
-end
+-- local function gotoHighScores()
+--     composer.gotoScene( "highscores", { time=600, effect="crossFade" } )
+-- end
 
-local function gotoSettings()
-	composer.gotoScene("settings", {time=800, effect="crossFade"})
-end
+-- local function gotoSettings()
+-- 	composer.gotoScene("settings", {time=600, effect="crossFade"})
+-- end
 
+-- Create the touch event handler function 
+local function buttonHandler( event )
+
+	if (event.phase == "began") then  
+	
+		event.target.xScale = 0.85 -- Scale the button on touch down so user knows its pressed
+		event.target.yScale = 0.85
+	
+	elseif (event.phase == "moved") then
+	
+		--something
+	
+	elseif (event.phase == "ended" or event.phase == "cancelled") then
+		
+		event.target.xScale = 1 -- Re-scale the button on touch release 
+		event.target.yScale = 1
+
+		if event.target.id == "play" then
+			composer.gotoScene( "instructions", { time=800, effect="crossFade" } )
+		elseif event.target.id == "highscores" then
+			composer.gotoScene( "highscores", { time=600, effect="crossFade" } )
+		else
+			composer.gotoScene("settings", {time=600, effect="crossFade"})
+		end
+	end
+	
+	return true
+	
+end 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -48,6 +77,7 @@ function scene:create( event )
 	local playButton = display.newImageRect(sceneGroup, "startBtn.png", 118, 47)
 	playButton.x = display.contentCenterX
 	playButton.y = 350
+	playButton.id = "play"
 
     --playButton:setFillColor( 0.82, 0.86, 1 )
  
@@ -56,15 +86,17 @@ function scene:create( event )
 	local highScoresButton = display.newImageRect(sceneGroup, "highscoresBtn.png", 232, 63)
 	highScoresButton.x = display.contentCenterX
 	highScoresButton.y = 400
+	highScoresButton.id = "highscores"
 
 	-- local settingsButton = display.newText( sceneGroup, "Settings", display.contentCenterX, 450, native.systemFont, 24 )
 	local settingsButton = display.newImageRect(sceneGroup, "settingsBtn.png", 178, 63)
 	settingsButton.x = display.contentCenterX
 	settingsButton.y = 450
+	settingsButton.id = "settings"
 
-	playButton:addEventListener( "tap", gotoGame )
-	highScoresButton:addEventListener( "tap", gotoHighScores )
-	settingsButton:addEventListener("tap", gotoSettings)
+	playButton:addEventListener( "touch", buttonHandler )
+	highScoresButton:addEventListener( "touch", buttonHandler )
+	settingsButton:addEventListener("touch", buttonHandler )
 end
 
 

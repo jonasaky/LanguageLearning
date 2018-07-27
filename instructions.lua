@@ -9,7 +9,7 @@ local widget = require( "widget" )
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
-local myButton
+local myButton, goBackButton
 local countDown = 3
 local countDownText
 local pickerWheel
@@ -25,6 +25,10 @@ local columnData =
 	}
 }
 
+-- local function gotoMenu()
+-- 	composer.gotoScene("menu", { time=600, effect="crossFade" })
+-- end
+
 local function countDownHandle()
 	if countDown == 1 then 
 		composer.gotoScene("game")
@@ -39,8 +43,8 @@ local function buttonHandler( event )
 
 	if (event.phase == "began") then  
 	
-		myButton.xScale = 0.35 -- Scale the button on touch down so user knows its pressed
-		myButton.yScale = 0.35
+		event.target.xScale = 0.85 -- Scale the button on touch down so user knows its pressed
+		event.target.yScale = 0.85
 	
 	elseif (event.phase == "moved") then
 	
@@ -48,18 +52,23 @@ local function buttonHandler( event )
 	
 	elseif (event.phase == "ended" or event.phase == "cancelled") then
 		
-		myButton.xScale = 0.4 -- Re-scale the button on touch release 
-		myButton.yScale = 0.4
+		event.target.xScale = 1 -- Re-scale the button on touch release 
+		event.target.yScale = 1
 	
-		countDownText.isVisible = true
-		timer.performWithDelay( 600, countDownHandle, 3)
-		-- myButton:removeEventListener("touch", buttonHandler)
-		myButton.isVisible = false
-	
-		local values = pickerWheel:getValues()
-		local selectedCategory = values[1].value
-		print(selectedCategory)
-		composer.setVariable( "selectedCategory", selectedCategory )
+		if event.target.id == "back" then
+			composer.gotoScene("menu", { time=600, effect="crossFade" })
+		else
+			goBackButton.isVisible = false
+			countDownText.isVisible = true
+			timer.performWithDelay( 600, countDownHandle, 3)
+			-- myButton:removeEventListener("touch", buttonHandler)
+			myButton.isVisible = false
+		
+			local values = pickerWheel:getValues()
+			local selectedCategory = values[1].value
+			print(selectedCategory)
+			composer.setVariable( "selectedCategory", selectedCategory )
+		end
 	end
 	
 	return true
@@ -81,12 +90,16 @@ function scene:create( event )
 	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
 	backcolor:setFillColor( 1, 0.85, 0.6 )
 
-	local titleText = display.newText( sceneGroup, "Description", 10, 0, "Segoe UI", 24 )
+	local titleText = display.newText( sceneGroup, "Description", 10, 0, "CHOWFUN_.ttf", 24 )
+	local gradient = {
+		type="gradient",
+		color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
+	}
 	titleText.anchorX = 0
-	titleText:setFillColor(0.5,0.5,0.5)
+	titleText:setFillColor(gradient)
 	local descriptionText = display.newText( sceneGroup, "This is a multiple choice word translation game. You need to tap the correct answer. " ..
-		"If you fail you can try again until you have the correct answer. \nTry to get as many as possible correct answers in 1 minute!!", display.contentCenterX, 120, 300, 0, "Segoe UI", 20)
-	descriptionText:setFillColor(0.5,0.5,0.5)
+		"If you fail you can try again until you have the correct answer. \nTry to get as many as possible correct answers in 1 minute!!", display.contentCenterX, 120, 300, 0, "CHOWFUN_.ttf", 18)
+	descriptionText:setFillColor(0.8,0.4,0.1)
 	-- local systemFonts = native.getFontNames() 
 	-- local searchString = "pt"
 	
@@ -97,8 +110,8 @@ function scene:create( event )
 	-- 		print( "Font Name = " .. tostring( fontName ) )
 	-- 	end
 	-- end
-	local selectionText = display.newText( sceneGroup, "Please select one category:", display.contentCenterX, 250, native.systemFont, 16)	
-	selectionText:setFillColor(0.5,0.5,0.5)
+	local selectionText = display.newText( sceneGroup, "Please select one group:", display.contentCenterX, 250, "CHOWFUN_.ttf", 16)	
+	selectionText:setFillColor(0.8,0.4,0.1)
 	pickerWheel = widget.newPickerWheel(
 	{
 		left = display.contentWidth - display.contentWidth * 0.9,
@@ -107,24 +120,29 @@ function scene:create( event )
 		style = "resizable",
 		width = display.contentWidth * 0.8,
 		rowHeight = 24,
-		fontSize = 14
-		-- columnColor = { 0.2, 0.2, 0.2 },
-		-- fontColorSelected = { 1, 1, 1 }
+		fontSize = 14,
+		columnColor = { 1, 0.85, 0.6 },
+		fontColorSelected = { 0.8,0.4,0.1 }
 	})
 	sceneGroup:insert(pickerWheel)
 
-	countDownText = display.newText(sceneGroup, countDown, display.contentCenterX,display.contentHeight - 10, native.systemFont, 40)
-	countDownText:setFillColor(0.5,0.5,0.5)
+	countDownText = display.newText(sceneGroup, countDown, display.contentCenterX,display.contentHeight - 50, "CHOWFUN_.ttf", 40)
+	countDownText:setFillColor(0.8,0.4,0.1)
 	countDownText.isVisible = false
 
-	myButton = display.newImageRect( sceneGroup, "play_btn.png", 552,198)
+	myButton = display.newImageRect( sceneGroup, "play_btn.png", 200,71)
 	myButton.x = display.contentCenterX
-	myButton.y = display.contentHeight - 10
-	myButton.xScale = 0.4
-	myButton.yScale = 0.4
+	myButton.y = display.contentHeight - 60
+	-- myButton.xScale = 0.4
+	-- myButton.yScale = 0.4
+	myButton.id = "play"
+
+	goBackButton = display.newImageRect(sceneGroup, "backBtn.png", 174, 63)
+	goBackButton.x, goBackButton.y = display.contentCenterX, display.contentHeight
+	goBackButton.id = "back"
 
 	myButton:addEventListener("touch",buttonHandler)
-
+	goBackButton:addEventListener("touch", buttonHandler)
 end
 
 

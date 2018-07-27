@@ -10,9 +10,14 @@ playerData = loadsave.loadTable("playerData.json")
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
-local mainGroup
-local question, optionA, optionB, optionC, optionD, finishButton, correct, scoreText
+local backGroup, mainGroup
+local correctSound, incorrectSound, finishSound
+local tryCount = 0
+local question, optionA, optionB, optionC, optionD, finishButton, correct, scoreText, scoreGoodText, badScoreText, hintText
 local score = 0
+local scoreGood = 0
+local badScore = 0
+local categoryNumber = 0
 local randomOrder = {}
 local wordsTable
 local progressBar
@@ -95,21 +100,25 @@ local function updateTime()
 	centiSecondsLeft = centiSecondsLeft - 1
 	
 	if centiSecondsLeft == 0 then
-		display.remove(clockText)
-		display.remove(question)
-		display.remove(optionA)
-		display.remove(optionB)
-		display.remove(optionC)
-		display.remove(optionD)
-		display.remove(scoreText)
-		local resultTitle = display.newText(mainGroup, "Great job!", display.contentCenterX, 100, display.contentWidth - 100, 0, "Segoe UI", 32)
-		resultTitle:setFillColor(0.5,0.5,0.5)
-		local scoreResult = display.newText(mainGroup, "Your score is " .. score, display.contentCenterX, 160, "Segoe UI", 36)
-		scoreResult:setFillColor(0.5,0.5,0.5)
+		-- display.remove(clockText)
+		-- display.remove(question)
+		-- display.remove(optionA)
+		-- display.remove(optionB)
+		-- display.remove(optionC)
+		-- display.remove(optionD)
+		-- display.remove(scoreText)
+		-- display.remove(scoreGoodText)
+		-- display.remove(badScoreText)
+		display.remove(mainGroup)
+		audio.play(finishSound)
+		local resultTitle = display.newText(backGroup, "Great job!", display.contentCenterX, 100, display.contentWidth - 100, 0, "CHOWFUN_.ttf", 28)
+		resultTitle:setFillColor(0.8,0.4,0.1)
+		local scoreResult = display.newText(backGroup, "Your score is " .. score, display.contentCenterX, 160, "CHOWFUN_.ttf", 36)
+		scoreResult:setFillColor(0.8,0.4,0.1)
 
-		if score > playerData.bestScore then
+		if score > playerData.scores[1] then
 			resultTitle.text = "New highscore!"
-			playerData.bestScore = score
+			playerData.scores[categoryNumber] = score
 			loadsave.saveTable(playerData, "playerData.json")
 		end
 		finishButton.isVisible = true
@@ -132,28 +141,37 @@ local function loadWords()
 	local category = composer.getVariable( "selectedCategory" )
 	if category == "Jr High 1 year Noun" then
 		wordsTable = loadsave.loadTable("jrhigh1year_noun.json", system.ResourceDirectory)
+		categoryNumber = 1
 	elseif category == "Jr High 1 year Verb" then
 		wordsTable = loadsave.loadTable("jrhigh1year_verb.json", system.ResourceDirectory)
+		categoryNumber = 2
 	elseif category == "Jr High 1 year Adj & Adv" then
 		wordsTable = loadsave.loadTable("jrhigh1year_adjadv.json", system.ResourceDirectory)
+		categoryNumber = 3
 	elseif category == "Jr High 2 year Noun" then
 		wordsTable = loadsave.loadTable("jrhigh2year_noun.json", system.ResourceDirectory)
+		categoryNumber = 4
 	elseif category == "Jr High 2 year Verb" then
 		wordsTable = loadsave.loadTable("jrhigh2year_verb.json", system.ResourceDirectory)
+		categoryNumber = 5
 	elseif category == "Jr High 2 year Adj" then
 		wordsTable = loadsave.loadTable("jrhigh2year_adj.json", system.ResourceDirectory)
+		categoryNumber = 6
 	elseif category == "Jr High 3 year Noun" then
 		wordsTable = loadsave.loadTable("jrhigh3year_noun.json", system.ResourceDirectory)
+		categoryNumber = 7
 	elseif category == "Jr High 3 year Verb" then
 		wordsTable = loadsave.loadTable("jrhigh3year_verb.json", system.ResourceDirectory)
+		categoryNumber = 8
 	elseif category == "Jr High 3 year Adj & Adv" then
 		wordsTable = loadsave.loadTable("jrhigh3year_adjadv.json", system.ResourceDirectory)
+		categoryNumber = 9
 	end
 end
 
-local function goToMenu()
-	composer.gotoScene("menu", { time=800, effect="crossFade" } )
-end	
+-- local function goToMenu()
+-- 	composer.gotoScene("menu", { time=800, effect="crossFade" } )
+-- end	
 
 local function has_value (tab, val)
     for index, value in ipairs(tab) do
@@ -175,7 +193,7 @@ end
 
 local function createQuestion(isEnglish)
 
-	display.remove ( correct )
+	-- display.remove ( correct )
 	optionA.isCorrect = false
 	optionB.isCorrect = false
 	optionC.isCorrect = false
@@ -194,6 +212,7 @@ local function createQuestion(isEnglish)
 	local answerText
 	if isEnglish == 1 then
 		answerText = wordsTable[total].japanese
+		hintText.text = ""
 		question.text = wordsTable[total].english
 		optionA.text = wordsTable[answersDisplayed[1]].japanese
 		optionB.text = wordsTable[answersDisplayed[2]].japanese
@@ -201,6 +220,7 @@ local function createQuestion(isEnglish)
 		optionD.text = wordsTable[answersDisplayed[4]].japanese
 	else
 		answerText = wordsTable[total].english
+		hintText.text = wordsTable[total].hiragana
 		question.text = wordsTable[total].japanese
 		optionA.text = wordsTable[answersDisplayed[1]].english
 		optionB.text = wordsTable[answersDisplayed[2]].english
@@ -231,10 +251,23 @@ local function evaluateAnswer( event )
 	
 
 	if event.target.isCorrect then
-		score = score + 1
-		scoreText.text = "current: " .. score
-		correct = display.newText( mainGroup, "✔", event.target.x + 40, event.target.y, native.systemFont, 24)
-		correct:setFillColor( .2,1,0)
+		if tryCount == 0 then
+			score = score + 1	
+			scoreText.text = "excellent: " .. score
+			audio.play(correctSound[1])
+		elseif tryCount == 1 then
+			scoreGood = scoreGood + 1
+			scoreGoodText.text = "good: " .. scoreGood
+			audio.play(correctSound[2])
+		else
+			badScore = badScore + 1
+			badScoreText.text = "bad: " .. badScore
+			audio.play(correctSound[3])
+		end		
+		tryCount = 0
+
+		-- correct = display.newText( mainGroup, "✔", event.target.x + 40, event.target.y, native.systemFont, 24)
+		-- correct:setFillColor( .2,1,0)
 
 		if total == 0 then
 			finishButton.isVisible = true
@@ -243,13 +276,49 @@ local function evaluateAnswer( event )
 		end
 		
 	else
-		local incorrectText = display.newText( mainGroup, "✘", event.target.x + 40, event.target.y, native.systemFont, 24)
-		incorrectText:setFillColor( 1, 0,0)
-		timer.performWithDelay( 500, function() display.remove(incorrectText) end )
+		tryCount = tryCount + 1
+		-- if tryCount > 1 then
+		-- 	audio.play(tryagainSound[math.random(3)])
+		-- else
+		-- 	audio.play(incorrectSound)			
+		-- end
+		audio.play(incorrectSound[math.random(3)])
+		
+		-- local incorrectText = display.newText( mainGroup, "✘", event.target.x + 40, event.target.y, native.systemFont, 24)
+		-- incorrectText:setFillColor( 1, 0,0)
+		-- timer.performWithDelay( 500, function() display.remove(incorrectText) end )
 		
 	end
 
 end
+
+local function buttonHandler( event )
+
+	if (event.phase == "began") then  
+	
+		event.target.xScale = 0.85 -- Scale the button on touch down so user knows its pressed
+		event.target.yScale = 0.85
+	
+	elseif (event.phase == "moved") then
+	
+		--something
+	
+	elseif (event.phase == "ended" or event.phase == "cancelled") then
+		
+		event.target.xScale = 1 -- Re-scale the button on touch release 
+		event.target.yScale = 1
+
+		if event.target.id == "finish" then
+			composer.gotoScene( "menu", { time=600, effect="crossFade" } )
+		else
+			evaluateAnswer(event)
+		end
+		
+	end
+	
+	return true
+	
+end 
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -261,13 +330,15 @@ function scene:create( event )
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
 	-- loadsave.saveTable(wordsTable, "words.json")
-	mainGroup = display.newGroup() 
+	backGroup = display.newGroup()
+	mainGroup = display.newGroup()
+	sceneGroup:insert( backGroup ) 
 	sceneGroup:insert( mainGroup ) 
 
 	-- local background = display.newImageRect(mainGroup, "background.png", 950, 1425) -- add a background
     -- 	background.x = math.floor(display.contentWidth / 2)
 	-- 	background.y = math.floor( display.contentHeight / 2)
-	local backcolor = display.newRect( mainGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
+	local backcolor = display.newRect( backGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
 	backcolor:setFillColor( 1, 0.85, 0.6 )
 
 	progressBar = display.newRect(mainGroup, 0, 0, display.contentWidth, 5)
@@ -278,11 +349,20 @@ function scene:create( event )
 	clockText = display.newText(mainGroup, "", display.contentCenterX, 10, native.systemFont, 40)
 	clockText.isVisible = false
 
-	scoreText = display.newText(mainGroup, "current: " .. score, 50, display.contentHeight, native.systemFont, 14)
-	scoreText:setFillColor(0.5,0.5,0.5)
+	scoreText = display.newText(backGroup, "excellent: " .. score, 50, display.contentHeight, native.systemFont, 14)
+	scoreText:setFillColor(0.8,0.4,0.1)
 
-	finishButton = display.newText( mainGroup, "Finish" , display.contentCenterX, 480, native.systemFont, 20 )	
-	finishButton:setFillColor( .6,.6,1 )
+	scoreGoodText = display.newText(backGroup, "good: " .. scoreGood, display.contentCenterX, display.contentHeight, native.systemFont, 14)
+	scoreGoodText:setFillColor(0.8,0.4,0.1)
+
+	badScoreText = display.newText(backGroup, "bad: " .. badScore, display.contentWidth - 40, display.contentHeight, native.systemFont, 14)
+	badScoreText:setFillColor(0.8,0.4,0.1)
+
+	-- finishButton = display.newText( mainGroup, "Finish" , display.contentCenterX, 480, native.systemFont, 20 )	
+	-- finishButton:setFillColor( .6,.6,1 )
+	finishButton = display.newImageRect( backGroup, "finishBtn.png", 145, 62)
+	finishButton.x, finishButton.y = display.contentCenterX, display.contentHeight - 100
+	finishButton.id = "finish"
 	finishButton.isVisible = false
 
 	-- joinTables(wordsTable, nounTable)
@@ -295,6 +375,8 @@ function scene:create( event )
 
 	total = #wordsTable
 
+	hintText = display.newText( mainGroup, "", display.contentCenterX, 90, native.systemFont, 18)
+	hintText:setFillColor(0.8,0.4,0.1)
 	local options = 
 	{
 		parent = mainGroup,
@@ -312,26 +394,31 @@ function scene:create( event )
 	question:setFillColor( 1, 0.5, 0)
 	
 	optionA = display.newText( mainGroup, "" , display.contentCenterX, 280, native.systemFont, 20 )	
-	optionA:setFillColor(0.5,0.5,0.5)
+	optionA:setFillColor(0.8,0.4,0.1)
 	-- optionA.anchorX = 0
 	optionB = display.newText( mainGroup, "" , display.contentCenterX, 330, native.systemFont, 20 )	
-	optionB:setFillColor(0.5,0.5,0.5)
+	optionB:setFillColor(0.8,0.4,0.1)
 	-- optionB.anchorX = 0
 	optionC = display.newText( mainGroup, "" , display.contentCenterX, 380, native.systemFont, 20 )	
-	optionC:setFillColor(0.5,0.5,0.5)
+	optionC:setFillColor(0.8,0.4,0.1)
 	-- optionC.anchorX = 0
 	optionD = display.newText( mainGroup, "" , display.contentCenterX, 430, native.systemFont, 20 )
-	optionD:setFillColor(0.5,0.5,0.5)
+	optionD:setFillColor(0.8,0.4,0.1)
 	-- optionD.anchorX = 0
 
 	createQuestion(1)
 
-	finishButton:addEventListener( "tap", goToMenu )
+	finishButton:addEventListener( "touch", buttonHandler )
 
-	optionA:addEventListener( "tap", evaluateAnswer)
-	optionB:addEventListener( "tap", evaluateAnswer)
-	optionC:addEventListener( "tap", evaluateAnswer)
-	optionD:addEventListener( "tap", evaluateAnswer)
+	optionA:addEventListener( "touch", buttonHandler)
+	optionB:addEventListener( "touch", buttonHandler)
+	optionC:addEventListener( "touch", buttonHandler)
+	optionD:addEventListener( "touch", buttonHandler)
+
+	correctSound = {audio.loadSound( "audio/yipee.mp3"), audio.loadSound("audio/crrect_answer1.mp3"), audio.loadSound("audio/crrect_answer2.mp3") }
+	incorrectSound = {audio.loadSound( "audio/blip01.mp3" ), audio.loadSound("audio/blip04.mp3"), audio.loadSound("audio/laugh.mp3") }
+	finishSound = audio.loadSound( "audio/crrect_answer3.mp3")
+	-- tryagainSound = audio.loadSound( "audio/laugh.mp3")
 end
 
 
@@ -372,7 +459,9 @@ function scene:destroy( event )
 
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
-
+	audio.dispose(correctSound)
+	audio.dispose(incorrectSound)
+	audio.dispose(finishSound)
 end
 
 

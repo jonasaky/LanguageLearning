@@ -13,9 +13,33 @@ playerData = loadsave.loadTable("playerData.json")
 
 local musicTrack
 
-local function gotoMenu()
-    composer.gotoScene( "menu", { time=600, effect="crossFade" } )
-end
+-- local function gotoMenu()
+--     composer.gotoScene( "menu", { time=600, effect="crossFade" } )
+-- end
+
+local function buttonHandler( event )
+
+	if (event.phase == "began") then  
+	
+		event.target.xScale = 0.85 -- Scale the button on touch down so user knows its pressed
+		event.target.yScale = 0.85
+	
+	elseif (event.phase == "moved") then
+	
+		--something
+	
+	elseif (event.phase == "ended" or event.phase == "cancelled") then
+		
+		event.target.xScale = 1 -- Re-scale the button on touch release 
+		event.target.yScale = 1
+
+		composer.gotoScene( "menu", { time=600, effect="crossFade" } )
+		
+	end
+	
+	return true
+	
+end 
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -32,16 +56,35 @@ function scene:create( event )
 	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
 	backcolor:setFillColor( 1, 0.85, 0.6 )
     
-	local highscoresText = display.newText(sceneGroup, "Highscores", display.contentCenterX, 0, native.SystemFont, 40)
-	highscoresText:setFillColor(0.5,0.5,0.5)
+	local highscoresText = display.newText(sceneGroup, "Highscores", display.contentCenterX, 0, "CHOWFUN_.ttf", 40)
+	local gradient = {
+		type="gradient",
+		color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
+	}
+	highscoresText:setFillColor(gradient)
 	
-	local yourScoreText = display.newText(sceneGroup, "countdown score: " .. playerData.bestScore, display.contentCenterX, 100, native.SystemFont, 26)
-	yourScoreText:setFillColor(0.5,0.5,0.5)
+	local subtitleText = display.newText(sceneGroup, "Countdown", display.contentCenterX, 50, "CHOWFUN_.ttf", 24)
+	subtitleText:setFillColor(0.8,0.4,0.1)
+	local yourScoreText = display.newText(sceneGroup, "Junior High 1 year__\n  Noun: \n  Verb: \n  Adjective & Adverb: \nJunior High 2 year__\n  Noun: \n  Verb: \n Adjective & Adverb: \nJunior High 3 year__\n  Noun: \n  Verb: \n Adjective & Adverb: ", 10, 240, "CHOWFUN_.ttf", 20)
+	yourScoreText.anchorX = 0
+	yourScoreText:setFillColor(0.8,0.4,0.1)
 
-	local goBackButton = display.newText(sceneGroup, "Go Back", display.contentCenterX, display.contentHeight, native.SystemFont, 30)
-	goBackButton:setFillColor( .6,.6,1 )
+	local scorePointsText = "\n"
+	for i = 1, #playerData.scores do
+		scorePointsText = scorePointsText .. playerData.scores[i] .. "\n"
+		if i == 3 or i == 6 then
+			scorePointsText = scorePointsText .. "\n"
+		end
+	end
+	local scorePoints = display.newText(sceneGroup, scorePointsText, display.contentWidth - 30, 255, "CHOWFUN_.ttf", 20)
+	scorePoints:setFillColor(0.9,0.4,0.1)
 
-	goBackButton:addEventListener("tap", gotoMenu)
+	-- local goBackButton = display.newText(sceneGroup, "Go Back", display.contentCenterX, display.contentHeight, native.SystemFont, 30)
+	-- goBackButton:setFillColor( .6,.6,1 )
+	local goBackButton = display.newImageRect(sceneGroup, "backBtn.png", 174, 63)
+	goBackButton.x, goBackButton.y = display.contentCenterX, display.contentHeight
+
+	goBackButton:addEventListener("touch", buttonHandler)
 end
 
 
