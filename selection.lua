@@ -55,15 +55,15 @@ function scene:create( event )
 	}
 	titleText:setFillColor(gradient)
 	
-	local option1Text = display.newText( sceneGroup, "Word test", display.contentCenterX, 350, native.systemFont, 24 )
+	local option1Text = display.newText( sceneGroup, "Word test", display.contentCenterX, 350, "CHOWFUN_.ttf", 24 )
 	option1Text:setFillColor(0.8,0.4,0.1)
 	option1Text.id = "option1"
 
-	local option2Text = display.newText( sceneGroup, "Countdown", display.contentCenterX, 400, native.systemFont, 24 )
+	local option2Text = display.newText( sceneGroup, "Countdown", display.contentCenterX, 400, "CHOWFUN_.ttf", 24 )
 	option2Text:setFillColor(0.8,0.4,0.1)
 	option2Text.id = "option2"
 
-	local option3Text = display.newText( sceneGroup, "Review", display.contentCenterX, 450, native.systemFont, 24 )
+	local option3Text = display.newText( sceneGroup, "Review", display.contentCenterX, 450, "CHOWFUN_.ttf", 24 )
 	option3Text:setFillColor(0.8,0.4,0.1)
 	option3Text.id = "option3"
 
