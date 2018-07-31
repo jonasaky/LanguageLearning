@@ -3,19 +3,10 @@ local composer = require( "composer" )
 
 local scene = composer.newScene()
 
-local loadsave = require("loadsave")
-playerData = loadsave.loadTable("playerData.json")
-
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
-
-local musicTrack
-
--- local function gotoMenu()
---     composer.gotoScene( "menu", { time=600, effect="crossFade" } )
--- end
 
 local function buttonHandler( event )
 
@@ -33,14 +24,18 @@ local function buttonHandler( event )
 		event.target.xScale = 1 -- Re-scale the button on touch release 
 		event.target.yScale = 1
 
-		composer.gotoScene( "menu", { time=400, effect="zoomInOutFade" } )
-		
+		if event.target.id == "option1" then
+			composer.gotoScene( "wordtest" )
+		elseif event.target.id == "option2" then
+			composer.gotoScene( "instructions" )
+		else
+			composer.gotoScene( "review" )
+		end
 	end
 	
 	return true
 	
 end 
-
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -50,41 +45,31 @@ function scene:create( event )
 
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
-	-- local background = display.newImageRect(sceneGroup, "background.png", 800, 1400) -- add a background
-    -- 	background.x = math.floor(display.contentWidth / 2)
-	-- 	background.y = math.floor( display.contentHeight / 2)
 	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
 	backcolor:setFillColor( 1, 0.85, 0.6 )
-    
-	local highscoresText = display.newText(sceneGroup, "Highscores", display.contentCenterX, 0, "CHOWFUN_.ttf", 40)
+
+	local titleText = display.newText( sceneGroup, "Selection Mode", display.contentCenterX, 0, "CHOWFUN_.ttf", 24 )
 	local gradient = {
 		type="gradient",
 		color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
 	}
-	highscoresText:setFillColor(gradient)
+	titleText:setFillColor(gradient)
 	
-	local subtitleText = display.newText(sceneGroup, "Countdown", display.contentCenterX, 50, "CHOWFUN_.ttf", 24)
-	subtitleText:setFillColor(0.8,0.4,0.1)
-	local yourScoreText = display.newText(sceneGroup, "Junior High 1 year__\n  Noun: \n  Verb: \n  Adjective & Adverb: \nJunior High 2 year__\n  Noun: \n  Verb: \n Adjective & Adverb: \nJunior High 3 year__\n  Noun: \n  Verb: \n Adjective & Adverb: ", 10, 240, "CHOWFUN_.ttf", 20)
-	yourScoreText.anchorX = 0
-	yourScoreText:setFillColor(0.8,0.4,0.1)
+	local option1Text = display.newText( sceneGroup, "Word test", display.contentCenterX, 350, native.systemFont, 24 )
+	option1Text:setFillColor(0.8,0.4,0.1)
+	option1Text.id = "option1"
 
-	local scorePointsText = "\n"
-	for i = 1, #playerData.scores do
-		scorePointsText = scorePointsText .. playerData.scores[i] .. "\n"
-		if i == 3 or i == 6 then
-			scorePointsText = scorePointsText .. "\n"
-		end
-	end
-	local scorePoints = display.newText(sceneGroup, scorePointsText, display.contentWidth - 30, 255, "CHOWFUN_.ttf", 20)
-	scorePoints:setFillColor(0.9,0.4,0.1)
+	local option2Text = display.newText( sceneGroup, "Countdown", display.contentCenterX, 400, native.systemFont, 24 )
+	option2Text:setFillColor(0.8,0.4,0.1)
+	option2Text.id = "option2"
 
-	-- local goBackButton = display.newText(sceneGroup, "Go Back", display.contentCenterX, display.contentHeight, native.SystemFont, 30)
-	-- goBackButton:setFillColor( .6,.6,1 )
-	local goBackButton = display.newImageRect(sceneGroup, "backBtn.png", 174, 63)
-	goBackButton.x, goBackButton.y = display.contentCenterX, display.contentHeight
+	local option3Text = display.newText( sceneGroup, "Review", display.contentCenterX, 450, native.systemFont, 24 )
+	option3Text:setFillColor(0.8,0.4,0.1)
+	option3Text.id = "option3"
 
-	goBackButton:addEventListener("touch", buttonHandler)
+	option1Text:addEventListener( "touch", buttonHandler )
+	option2Text:addEventListener( "touch", buttonHandler )
+	option3Text:addEventListener( "touch", buttonHandler )
 end
 
 
@@ -115,7 +100,8 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
-		composer.removeScene( "highscores" )
+		Runtime:removeEventListener( "key", onKeyEvent )
+		composer.removeScene("selection")
 	end
 end
 

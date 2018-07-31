@@ -309,7 +309,7 @@ local function buttonHandler( event )
 		event.target.yScale = 1
 
 		if event.target.id == "finish" then
-			composer.gotoScene( "menu", { time=600, effect="crossFade" } )
+			composer.gotoScene( "menu", { time=400, effect="zoomInOutFade" } )
 		else
 			evaluateAnswer(event)
 		end

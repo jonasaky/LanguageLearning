@@ -29,5 +29,28 @@ if(playerData == nil) then
 	loadsave.saveTable(newPlayer, "playerData.json")
 end
 
+local function onKeyEvent( event )
+	local phase = event.phase
+	local keyName = event.keyName
+	local scene = composer.getSceneName( "current" )
+	local options = {
+		effect = "zoomInOutFade",
+        time = 400
+	}
+ 
+	if( (keyName == "back") and (phase == "down") ) then 
+	   -- DO SOMETHING HERE
+		if scene == "selection" or scene == "highscores" or scene == "settings" then
+			composer.gotoScene( "menu", options )
+		elseif scene == "instructions" or scene == "wordtest" or scene == "review" then
+			composer.gotoScene("selection", options)
+		elseif scene == "menu" then
+			native.requestExit()
+		end
+	end
+	return true
+end
+Runtime:addEventListener( "key", onKeyEvent );
+
 -- Go to the menu screen
 composer.gotoScene( "menu" )

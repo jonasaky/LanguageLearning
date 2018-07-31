@@ -56,7 +56,7 @@ local function buttonHandler( event )
 		event.target.yScale = 1
 
 		loadsave.saveTable(playerData, "playerData.json")
-		composer.gotoScene( "menu", { time=600, effect="crossFade" } )
+		composer.gotoScene( "menu", { time=400, effect="zoomInOutFade" } )
 		
 	end
 	

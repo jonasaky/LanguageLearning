@@ -40,11 +40,11 @@ local function buttonHandler( event )
 		event.target.yScale = 1
 
 		if event.target.id == "play" then
-			composer.gotoScene( "instructions", { time=800, effect="crossFade" } )
+			composer.gotoScene( "selection", { time=800, effect="fromRight" } )
 		elseif event.target.id == "highscores" then
-			composer.gotoScene( "highscores", { time=600, effect="crossFade" } )
+			composer.gotoScene( "highscores", { time=600, effect="fromRight" } )
 		else
-			composer.gotoScene("settings", {time=600, effect="crossFade"})
+			composer.gotoScene("settings", {time=600, effect="fromRight"})
 		end
 	end
 	
