@@ -84,6 +84,7 @@ if wordsTable == nil then
 	}
 end
 
+local countdownTimer
 local centiSecondsLeft = 1*6000
 local clockText
 local minutes
@@ -116,7 +117,7 @@ local function updateTime()
 		local scoreResult = display.newText(backGroup, "Your score is " .. score, display.contentCenterX, 160, "CHOWFUN_.ttf", 36)
 		scoreResult:setFillColor(0.8,0.4,0.1)
 
-		if score > playerData.scores[1] then
+		if score > playerData.scores[categoryNumber] then
 			resultTitle.text = "New highscore!"
 			playerData.scores[categoryNumber] = score
 			loadsave.saveTable(playerData, "playerData.json")
@@ -320,6 +321,35 @@ local function buttonHandler( event )
 	
 end 
 
+local function onKeyEvent(event)
+	local phase = event.phase
+	local keyName = event.keyName
+ 
+	if( (keyName == "back") and (phase == "down") ) then 
+	   -- DO SOMETHING HERE
+		timer.cancel(countdownTimer)
+		-- Handler that gets notified when the alert closes
+		local function onComplete( event )
+			if ( event.action == "clicked" ) then
+				local i = event.index
+				if ( i == 1 ) then
+					-- Do nothing; dialog will simply dismiss
+					-- timer
+				elseif ( i == 2 ) then
+					-- Open URL if "Learn More" (second button) was clicked
+					-- system.openURL( "http://www.coronalabs.com" )
+					-- composer.removeScene("game")
+					composer.gotoScene("instructions", options)
+				end
+			end
+		end
+		
+		-- Show alert with two buttons
+		local alert = native.showAlert( "", "Finish game?", { "Cancel", "Yes" }, onComplete )
+		
+	end
+	return true
+end
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -345,7 +375,7 @@ function scene:create( event )
 	progressBar.anchorX = 0
 	progressBar:setFillColor(1,0.2,0.2)
 	
-	timer.performWithDelay(10, updateTime, centiSecondsLeft)
+	countdownTimer = timer.performWithDelay(10, updateTime, centiSecondsLeft)
 	clockText = display.newText(mainGroup, "", display.contentCenterX, 10, native.systemFont, 40)
 	clockText.isVisible = false
 
@@ -419,6 +449,8 @@ function scene:create( event )
 	incorrectSound = {audio.loadSound( "audio/blip01.mp3" ), audio.loadSound("audio/blip04.mp3"), audio.loadSound("audio/laugh.mp3") }
 	finishSound = audio.loadSound( "audio/crrect_answer3.mp3")
 	-- tryagainSound = audio.loadSound( "audio/laugh.mp3")
+
+	Runtime:addEventListener("key", onKeyEvent)
 end
 
 

@@ -20,6 +20,7 @@ audio.setVolume( 0.5, { channel=1 } )
 -- Using Rob Miracle's loadsave library
 local loadsave = require("loadsave")
 playerData = loadsave.loadTable("playerData.json") -- try to load the initial data in
+settingsData = loadsave.loadTable("settingsData.json")
 
 -- If data doesn't exist, create it!
 if(playerData == nil) then 
@@ -27,6 +28,14 @@ if(playerData == nil) then
 	newPlayer["scores"] = {0,0,0,0,0,0,0,0,0}
 	newPlayer["username"] = "user" .. math.random(1000, 9999)
 	loadsave.saveTable(newPlayer, "playerData.json")
+end
+
+if(settingsData == nil) then
+	settingsData = {}
+	settingsData["isVolumeOn"] = true
+	loadsave.saveTable(settingsData, "settingsData.json")
+elseif not settingsData.isVolumeOn then
+	audio.setVolume(0)
 end
 
 local function onKeyEvent( event )

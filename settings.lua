@@ -5,7 +5,9 @@ local scene = composer.newScene()
 
 local loadsave = require("loadsave")
 playerData = loadsave.loadTable("playerData.json")
+settingsData = loadsave.loadTable("settingsData.json")
 
+local widget = require( "widget" )
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -63,6 +65,19 @@ local function buttonHandler( event )
 	return true
 	
 end 
+
+-- Handle press events for the checkbox
+local function onSwitchPress( event )
+	local switch = event.target
+	print( "Switch with ID '"..switch.id.."' is on: "..tostring(switch.isOn) )
+	if (switch.isOn) then		
+		audio.setVolume(0.7)
+	else
+		audio.setVolume(0)
+	end
+	settingsData.isVolumeOn = switch.isOn
+	loadsave.saveTable(settingsData, "settingsData.json")
+end
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -97,7 +112,37 @@ function scene:create( event )
 	defaultField.text = playerData.username
 	defaultField.font = customFont
 	sceneGroup:insert(defaultField)
+
+	local volumeText = display.newText(sceneGroup, "Volume:", display.contentCenterX, 200, "CHOWFUN_.ttf", 24 )
+	volumeText:setFillColor(0.8,0.4,0.1)
 	
+	-- Image sheet options and declaration
+	local options = {
+		width = 100,
+		height = 100,
+		numFrames = 2,
+		sheetContentWidth = 200,
+		sheetContentHeight = 100
+	}
+	local checkboxSheet = graphics.newImageSheet( "widget-radio-checkbox.png", options )
+
+	local onOffVolume = widget.newSwitch(
+		{
+			left = display.contentCenterX - 30,
+			top = 220,
+			style = "checkbox",
+			id = "volumeCheckbox",
+			width = 70,
+			height = 70,
+			frameOff = 1,
+			frameOn = 2,
+			onPress = onSwitchPress,
+			sheet = checkboxSheet,
+			initialSwitchState = settingsData.isVolumeOn
+		}
+	)
+	sceneGroup:insert(onOffVolume)
+
 	-- local goBackButton = display.newText(sceneGroup, "Go Back", display.contentCenterX, display.contentHeight, native.SystemFont, 30)
 	-- goBackButton:setFillColor( .6,.6,1 )
 	local goBackButton = display.newImageRect(sceneGroup, "backBtn.png", 174, 63)
