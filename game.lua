@@ -327,14 +327,15 @@ local function onKeyEvent(event)
  
 	if( (keyName == "back") and (phase == "down") ) then 
 	   -- DO SOMETHING HERE
-		timer.cancel(countdownTimer)
+		timer.pause(countdownTimer)
 		-- Handler that gets notified when the alert closes
 		local function onComplete( event )
 			if ( event.action == "clicked" ) then
 				local i = event.index
 				if ( i == 1 ) then
 					-- Do nothing; dialog will simply dismiss
-					-- timer
+					timer.resume(countdownTimer)
+					print("resume timer")
 				elseif ( i == 2 ) then
 					-- Open URL if "Learn More" (second button) was clicked
 					-- system.openURL( "http://www.coronalabs.com" )
@@ -481,6 +482,7 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
+		Runtime:removeEventListener("key", onKeyEvent)
 		composer.removeScene( "game" )
 	end
 end

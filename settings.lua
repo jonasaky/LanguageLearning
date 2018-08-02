@@ -143,10 +143,10 @@ function scene:create( event )
 	)
 	sceneGroup:insert(onOffVolume)
 
-	-- local goBackButton = display.newText(sceneGroup, "Go Back", display.contentCenterX, display.contentHeight, native.SystemFont, 30)
-	-- goBackButton:setFillColor( .6,.6,1 )
-	local goBackButton = display.newImageRect(sceneGroup, "backBtn.png", 174, 63)
-	goBackButton.x, goBackButton.y = display.contentCenterX, display.contentHeight
+	local goBackButton = display.newText(sceneGroup, "Save changes", display.contentCenterX, display.contentHeight, "CHOWFUN_.ttf", 30)
+	goBackButton:setFillColor(0.8,0.4,0.1)
+	-- local goBackButton = display.newImageRect(sceneGroup, "backBtn.png", 174, 63)
+	-- goBackButton.x, goBackButton.y = display.contentCenterX, display.contentHeight
 
 	goBackButton:addEventListener("touch", buttonHandler)
 end
