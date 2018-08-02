@@ -8,7 +8,7 @@ local widget = require( "widget" )
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
-
+local selectedCategory
 local myButton
 local countDown = 3
 local countDownText
@@ -31,7 +31,7 @@ local columnData =
 
 local function countDownHandle()
 	if countDown == 1 then 
-		composer.gotoScene("game")
+		composer.gotoScene("game", { params = {gameMode = "countDown", selectedCategory = selectedCategory}})
 	else
 		countDown = countDown - 1
 		countDownText.text = countDown	
@@ -65,9 +65,9 @@ local function buttonHandler( event )
 			myButton.isVisible = false
 		
 			local values = pickerWheel:getValues()
-			local selectedCategory = values[1].value
+			selectedCategory = values[1].value
 			print(selectedCategory)
-			composer.setVariable( "selectedCategory", selectedCategory )
+			-- composer.setVariable( "selectedCategory", selectedCategory )
 		-- end
 	end
 	

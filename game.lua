@@ -9,7 +9,7 @@ playerData = loadsave.loadTable("playerData.json")
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
-
+local gameMode
 local backGroup, mainGroup
 local correctSound, incorrectSound, finishSound
 local tryCount = 0
@@ -138,8 +138,8 @@ local function joinTables(t1, t2)
 	return t1
  end
 
-local function loadWords()
-	local category = composer.getVariable( "selectedCategory" )
+local function loadWords(category)
+	-- local category = composer.getVariable( "selectedCategory" )
 	if category == "Jr High 1 year Noun" then
 		wordsTable = loadsave.loadTable("jrhigh1year_noun.json", system.ResourceDirectory)
 		categoryNumber = 1
@@ -190,6 +190,23 @@ local function shuffling (tab)
 		local random2 = math.random(#tab)
 		tab[random1], tab[random2] = tab[random2], tab[random1]
 	end
+end
+
+local function showFinalScore()
+	print("show Final score")
+	display.remove(mainGroup)
+	audio.play(finishSound)
+	local resultTitle = display.newText(backGroup, "Great job!", display.contentCenterX, 100, display.contentWidth - 100, 0, "CHOWFUN_.ttf", 28)
+	resultTitle:setFillColor(0.8,0.4,0.1)
+	local scoreResult = display.newText(backGroup, "Your score is " .. score, display.contentCenterX, 160, "CHOWFUN_.ttf", 36)
+	scoreResult:setFillColor(0.8,0.4,0.1)
+
+	if score > playerData.scores[categoryNumber] then
+		resultTitle.text = "New highscore!"
+		-- playerData.scores[categoryNumber] = score
+		-- loadsave.saveTable(playerData, "playerData.json")
+	end
+	finishButton.isVisible = true
 end
 
 local function createQuestion(isEnglish)
@@ -270,8 +287,8 @@ local function evaluateAnswer( event )
 		-- correct = display.newText( mainGroup, "✔", event.target.x + 40, event.target.y, native.systemFont, 24)
 		-- correct:setFillColor( .2,1,0)
 
-		if total == 0 then
-			finishButton.isVisible = true
+		if gameMode == "wordTest" and total == 0 then
+			showFinalScore()
 		else
 			timer.performWithDelay( 100, function() createQuestion(math.random(2)) end )
 		end
@@ -327,14 +344,14 @@ local function onKeyEvent(event)
  
 	if( (keyName == "back") and (phase == "down") ) then 
 	   -- DO SOMETHING HERE
-		timer.pause(countdownTimer)
+		if not countdownTimer == nil then timer.pause(countdownTimer) end
 		-- Handler that gets notified when the alert closes
 		local function onComplete( event )
 			if ( event.action == "clicked" ) then
 				local i = event.index
 				if ( i == 1 ) then
 					-- Do nothing; dialog will simply dismiss
-					timer.resume(countdownTimer)
+					if not countdownTimer == nil then timer.resume(countdownTimer) end
 					print("resume timer")
 				elseif ( i == 2 ) then
 					-- Open URL if "Learn More" (second button) was clicked
@@ -342,6 +359,8 @@ local function onKeyEvent(event)
 					-- composer.removeScene("game")
 					composer.gotoScene("instructions", options)
 				end
+			else
+				if not countdownTimer == nil then timer.resume(countdownTimer) end
 			end
 		end
 		
@@ -366,19 +385,24 @@ function scene:create( event )
 	sceneGroup:insert( backGroup ) 
 	sceneGroup:insert( mainGroup ) 
 
+	print( event.params["gameMode"] )
+	gameMode = event.params["gameMode"]
+
 	-- local background = display.newImageRect(mainGroup, "background.png", 950, 1425) -- add a background
     -- 	background.x = math.floor(display.contentWidth / 2)
 	-- 	background.y = math.floor( display.contentHeight / 2)
 	local backcolor = display.newRect( backGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
 	backcolor:setFillColor( 1, 0.85, 0.6 )
 
-	progressBar = display.newRect(mainGroup, 0, 0, display.contentWidth, 5)
-	progressBar.anchorX = 0
-	progressBar:setFillColor(1,0.2,0.2)
-	
-	countdownTimer = timer.performWithDelay(10, updateTime, centiSecondsLeft)
-	clockText = display.newText(mainGroup, "", display.contentCenterX, 10, native.systemFont, 40)
-	clockText.isVisible = false
+	if gameMode == "countDown" then
+		progressBar = display.newRect(mainGroup, 0, 0, display.contentWidth, 5)
+		progressBar.anchorX = 0
+		progressBar:setFillColor(1,0.2,0.2)
+		
+		countdownTimer = timer.performWithDelay(10, updateTime, centiSecondsLeft)
+		clockText = display.newText(mainGroup, "", display.contentCenterX, 10, native.systemFont, 40)
+		clockText.isVisible = false
+	end
 
 	scoreText = display.newText(backGroup, "excellent: " .. score, 50, display.contentHeight, native.systemFont, 14)
 	scoreText:setFillColor(0.8,0.4,0.1)
@@ -397,14 +421,20 @@ function scene:create( event )
 	finishButton.isVisible = false
 
 	-- joinTables(wordsTable, nounTable)
-	loadWords()
+	loadWords(event.params["selectedCategory"])
 	shuffling(wordsTable)
 	
 	-- for i = 1, #wordsTable do 
 	-- 	print(wordsTable[i].english)
 	-- end
 
-	total = #wordsTable
+	if gameMode == "wordTest" then
+		-- total = event.params["wordsNumber"]
+		print(event.params["selectedTotalWords"])
+		total = 3
+	else
+		total = #wordsTable
+	end
 
 	hintText = display.newText( mainGroup, "", display.contentCenterX, 90, native.systemFont, 18)
 	hintText:setFillColor(0.8,0.4,0.1)
@@ -413,7 +443,7 @@ function scene:create( event )
 		parent = mainGroup,
 		text = "",     
 		x = display.contentCenterX,
-		y = 120,
+		y = 140,
 		width = display.actualContentWidth,
 		font = native.systemFont,   
 		fontSize = 40,

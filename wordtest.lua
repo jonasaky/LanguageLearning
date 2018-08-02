@@ -55,7 +55,7 @@ local function buttonHandler( event )
 		else
 			local values = pickerWheel:getValues()
 			wordsGroup = values[1].value
-			composer.gotoScene("wordtestGame", {time=600, effect="fromRight", params = {wordsNumber = wordsNumber, wordsGroup = wordsGroup} })
+			composer.gotoScene("game", {time=600, effect="fromRight", params = {gameMode = "wordTest", selectedTotalWords = wordsNumber, selectedCategory = wordsGroup} })
 		end
 		
 	end
@@ -101,6 +101,7 @@ function scene:create( event )
 	words30Button.id = "30"
 	words50Button.id = "50"
 	words100Button.id = "100"
+	wordsNumber = 20 --default selected
 
 	local selectionText = display.newText( sceneGroup, "Please select one group:", display.contentCenterX, 280, "CHOWFUN_.ttf", 16)	
 	selectionText:setFillColor(0.8,0.4,0.1)
