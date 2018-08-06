@@ -9,7 +9,7 @@ local widget = require( "widget" )
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 local selectedCategory
-local myButton
+local playButton
 local countDown = 3
 local countDownText
 local pickerWheel
@@ -60,9 +60,9 @@ local function buttonHandler( event )
 		-- else
 			-- goBackButton.isVisible = false
 			countDownText.isVisible = true
-			timer.performWithDelay( 600, countDownHandle, 3)
-			-- myButton:removeEventListener("touch", buttonHandler)
-			myButton.isVisible = false
+			timer.performWithDelay( 400, countDownHandle, 3)
+			-- playButton:removeEventListener("touch", buttonHandler)
+			playButton.isVisible = false
 		
 			local values = pickerWheel:getValues()
 			selectedCategory = values[1].value
@@ -130,18 +130,18 @@ function scene:create( event )
 	countDownText:setFillColor(0.8,0.4,0.1)
 	countDownText.isVisible = false
 
-	myButton = display.newImageRect( sceneGroup, "play_btn.png", 200,71)
-	myButton.x = display.contentCenterX
-	myButton.y = display.contentHeight - 60
-	-- myButton.xScale = 0.4
-	-- myButton.yScale = 0.4
-	myButton.id = "play"
+	playButton = display.newImageRect( sceneGroup, "play_btn.png", 200,71)
+	playButton.x = display.contentCenterX
+	playButton.y = display.contentHeight - 60
+	-- playButton.xScale = 0.4
+	-- playButton.yScale = 0.4
+	playButton.id = "play"
 
 	-- goBackButton = display.newImageRect(sceneGroup, "backBtn.png", 174, 63)
 	-- goBackButton.x, goBackButton.y = display.contentCenterX, display.contentHeight
 	-- goBackButton.id = "back"
 
-	myButton:addEventListener("touch",buttonHandler)
+	playButton:addEventListener("touch",buttonHandler)
 	-- goBackButton:addEventListener("touch", buttonHandler)
 end
 

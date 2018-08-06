@@ -101,15 +101,6 @@ local function updateTime()
 	centiSecondsLeft = centiSecondsLeft - 1
 	
 	if centiSecondsLeft == 0 then
-		-- display.remove(clockText)
-		-- display.remove(question)
-		-- display.remove(optionA)
-		-- display.remove(optionB)
-		-- display.remove(optionC)
-		-- display.remove(optionD)
-		-- display.remove(scoreText)
-		-- display.remove(scoreGoodText)
-		-- display.remove(badScoreText)
 		display.remove(mainGroup)
 		audio.play(finishSound)
 		local resultTitle = display.newText(backGroup, "Great job!", display.contentCenterX, 100, display.contentWidth - 100, 0, "CHOWFUN_.ttf", 28)
@@ -170,10 +161,6 @@ local function loadWords(category)
 	end
 end
 
--- local function goToMenu()
--- 	composer.gotoScene("menu", { time=800, effect="crossFade" } )
--- end	
-
 local function has_value (tab, val)
     for index, value in ipairs(tab) do
         if value == val then
@@ -193,7 +180,6 @@ local function shuffling (tab)
 end
 
 local function showFinalScore()
-	print("show Final score")
 	display.remove(mainGroup)
 	audio.play(finishSound)
 	local resultTitle = display.newText(backGroup, "Great job!", display.contentCenterX, 100, display.contentWidth - 100, 0, "CHOWFUN_.ttf", 28)
@@ -201,10 +187,10 @@ local function showFinalScore()
 	local scoreResult = display.newText(backGroup, "Your score is " .. score, display.contentCenterX, 160, "CHOWFUN_.ttf", 36)
 	scoreResult:setFillColor(0.8,0.4,0.1)
 
-	if score > playerData.scores[categoryNumber] then
+	if score > playerData.scoresWordtest[categoryNumber] then
 		resultTitle.text = "New highscore!"
-		-- playerData.scores[categoryNumber] = score
-		-- loadsave.saveTable(playerData, "playerData.json")
+		playerData.scoresWordtest[categoryNumber] = score
+		loadsave.saveTable(playerData, "playerData.json")
 	end
 	finishButton.isVisible = true
 end
@@ -265,10 +251,10 @@ local function createQuestion(isEnglish)
 	total = total - 1
 end
 
-local function evaluateAnswer( event )
+local function evaluateAnswer( answer )
 	
 
-	if event.target.isCorrect then
+	if answer.isCorrect then
 		if tryCount == 0 then
 			score = score + 1	
 			scoreText.text = "excellent: " .. score
@@ -284,7 +270,7 @@ local function evaluateAnswer( event )
 		end		
 		tryCount = 0
 
-		-- correct = display.newText( mainGroup, "✔", event.target.x + 40, event.target.y, native.systemFont, 24)
+		-- correct = display.newText( mainGroup, "✔", answer.x + 40, answer.y, native.systemFont, 24)
 		-- correct:setFillColor( .2,1,0)
 
 		if gameMode == "wordTest" and total == 0 then
@@ -302,7 +288,7 @@ local function evaluateAnswer( event )
 		-- end
 		audio.play(incorrectSound[math.random(3)])
 		
-		-- local incorrectText = display.newText( mainGroup, "✘", event.target.x + 40, event.target.y, native.systemFont, 24)
+		-- local incorrectText = display.newText( mainGroup, "✘", answer.x + 40, answer.y, native.systemFont, 24)
 		-- incorrectText:setFillColor( 1, 0,0)
 		-- timer.performWithDelay( 500, function() display.remove(incorrectText) end )
 		
@@ -310,12 +296,50 @@ local function evaluateAnswer( event )
 
 end
 
+local function hideShowIncorrectAnswers(value)
+	if optionA.isCorrect then
+		optionB.alpha = value
+		optionC.alpha = value
+		optionD.alpha = value
+	elseif optionB.isCorrect then
+		optionA.alpha = value
+		optionC.alpha = value
+		optionD.alpha = value
+	elseif optionC.isCorrect then
+		optionA.alpha = value
+		optionB.alpha = value
+		optionD.alpha = value
+	else
+		optionA.alpha = value
+		optionB.alpha = value
+		optionC.alpha = value
+	end
+end
+
+local function listener1( obj )
+	-- print( "Transition 1 completed on object: " .. obj )
+	obj.alpha = 1
+	obj.xScale = 1
+	obj.yScale = 1
+	obj:setFillColor(0.8,0.4,0.1)
+	evaluateAnswer(obj)	
+	hideShowIncorrectAnswers(1)
+end
+
 local function buttonHandler( event )
 
 	if (event.phase == "began") then  
-	
-		event.target.xScale = 0.85 -- Scale the button on touch down so user knows its pressed
-		event.target.yScale = 0.85
+		-- Scale the button on touch down so user knows its pressed
+		if event.target.isCorrect then
+			event.target:setFillColor(0,1,0)
+			hideShowIncorrectAnswers(0)
+			transition.to( event.target, { time=1000, alpha=0, xScale=(3), yScale=(3), onComplete=listener1 } )
+		else	
+			event.target:setFillColor(1,0,0)
+			-- event.target.xScale = 0.85 
+			-- event.target.yScale = 0.85
+			transition.to( event.target, { time=300, xScale=(0.85), yScale=(0.85), onComplete=listener1 } )
+		end		
 	
 	elseif (event.phase == "moved") then
 	
@@ -323,13 +347,13 @@ local function buttonHandler( event )
 	
 	elseif (event.phase == "ended" or event.phase == "cancelled") then
 		
-		event.target.xScale = 1 -- Re-scale the button on touch release 
-		event.target.yScale = 1
+		-- event.target.xScale = 1 -- Re-scale the button on touch release 
+		-- event.target.yScale = 1
 
 		if event.target.id == "finish" then
 			composer.gotoScene( "menu", { time=400, effect="zoomInOutFade" } )
 		else
-			evaluateAnswer(event)
+			-- evaluateAnswer(event)
 		end
 		
 	end
@@ -338,29 +362,48 @@ local function buttonHandler( event )
 	
 end 
 
+local function pauseResumeTimer(isPaused)
+	if countdownTimer then
+		if isPaused then
+			-- print("resume timer")
+			timer.resume(countdownTimer)
+		else
+			-- print("pause timer")
+			timer.pause(countdownTimer)
+		end
+	end
+end
+
+local function exitGame()
+	if gameMode == "countDown" then
+		composer.gotoScene("instructions", options)
+	else
+		composer.gotoScene("wordtest", options)
+	end
+end
+
 local function onKeyEvent(event)
 	local phase = event.phase
 	local keyName = event.keyName
  
 	if( (keyName == "back") and (phase == "down") ) then 
 	   -- DO SOMETHING HERE
-		if not countdownTimer == nil then timer.pause(countdownTimer) end
+		pauseResumeTimer(false)
 		-- Handler that gets notified when the alert closes
 		local function onComplete( event )
 			if ( event.action == "clicked" ) then
 				local i = event.index
 				if ( i == 1 ) then
 					-- Do nothing; dialog will simply dismiss
-					if not countdownTimer == nil then timer.resume(countdownTimer) end
-					print("resume timer")
+					pauseResumeTimer(true)
 				elseif ( i == 2 ) then
 					-- Open URL if "Learn More" (second button) was clicked
 					-- system.openURL( "http://www.coronalabs.com" )
 					-- composer.removeScene("game")
-					composer.gotoScene("instructions", options)
+					exitGame()
 				end
 			else
-				if not countdownTimer == nil then timer.resume(countdownTimer) end
+				pauseResumeTimer(true)
 			end
 		end
 		
@@ -431,7 +474,17 @@ function scene:create( event )
 	if gameMode == "wordTest" then
 		-- total = event.params["wordsNumber"]
 		print(event.params["selectedTotalWords"])
-		total = 3
+		if event.params["selectedTotalWords"] == 20 then
+			categoryNumber = 1
+		elseif event.params["selectedTotalWords"] == 30 then
+			categoryNumber = 2
+		elseif event.params["selectedTotalWords"] == 50 then
+			categoryNumber = 3
+		else
+			categoryNumber = 4
+		end
+
+		total = event.params["selectedTotalWords"]
 	else
 		total = #wordsTable
 	end
