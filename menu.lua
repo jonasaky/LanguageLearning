@@ -97,6 +97,8 @@ function scene:create( event )
 	playButton:addEventListener( "touch", buttonHandler )
 	highScoresButton:addEventListener( "touch", buttonHandler )
 	settingsButton:addEventListener("touch", buttonHandler )
+
+	musicTrack = audio.loadStream("audio/miyako-japan3.mp3")
 end
 
 
@@ -111,7 +113,8 @@ function scene:show( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
-
+		-- Start the music!
+		audio.play( musicTrack, { channel=1, loops=-1 } )
 	end
 end
 
@@ -127,7 +130,8 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
-
+		-- Stop the music!
+        -- audio.stop( 1 )
 	end
 end
 
@@ -137,7 +141,7 @@ function scene:destroy( event )
 
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
-
+	audio.dispose( musicTrack )
 end
 
 

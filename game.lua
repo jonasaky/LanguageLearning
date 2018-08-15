@@ -22,6 +22,7 @@ local randomOrder = {}
 local wordsTable
 local progressBar
 local total
+local musicTrack
 
 if wordsTable == nil then
 	wordsTable = 
@@ -91,6 +92,30 @@ local minutes
 local second
 local centiSeconds
 
+local function showFinalScore()
+	display.remove(mainGroup)
+	audio.play(finishSound)
+	local resultTitle = display.newText(backGroup, "Great job!", display.contentCenterX, 0, "CHOWFUN_.ttf", 28)
+	resultTitle:setFillColor(0.8,0.4,0.1)
+	local scoreResult = display.newText(backGroup, " Your score　\nExcellent: " .. score .. "\nGood: " .. scoreGood .. "\nBad: " .. badScore, display.contentCenterX, 160, "CHOWFUN_.ttf", 30)
+	scoreResult:setFillColor(0.8,0.4,0.1)
+
+	if gameMode == "wordtest" then
+		if score > playerData.scoresWordtest[categoryNumber] then
+			resultTitle.text = "New highscore!"
+			playerData.scoresWordtest[categoryNumber] = score
+			loadsave.saveTable(playerData, "playerData.json")
+		end
+	else
+		if score > playerData.scores[categoryNumber] then
+			resultTitle.text = "New highscore!"
+			playerData.scores[categoryNumber] = score
+			loadsave.saveTable(playerData, "playerData.json")
+		end
+	end
+	finishButton.isVisible = true
+end
+
 local function updateTime()
 
     minutes = math.floor(centiSecondsLeft/6000)
@@ -101,19 +126,7 @@ local function updateTime()
 	centiSecondsLeft = centiSecondsLeft - 1
 	
 	if centiSecondsLeft == 0 then
-		display.remove(mainGroup)
-		audio.play(finishSound)
-		local resultTitle = display.newText(backGroup, "Great job!", display.contentCenterX, 100, display.contentWidth - 100, 0, "CHOWFUN_.ttf", 28)
-		resultTitle:setFillColor(0.8,0.4,0.1)
-		local scoreResult = display.newText(backGroup, "Your score is " .. score, display.contentCenterX, 160, "CHOWFUN_.ttf", 36)
-		scoreResult:setFillColor(0.8,0.4,0.1)
-
-		if score > playerData.scores[categoryNumber] then
-			resultTitle.text = "New highscore!"
-			playerData.scores[categoryNumber] = score
-			loadsave.saveTable(playerData, "playerData.json")
-		end
-		finishButton.isVisible = true
+		showFinalScore()
 	end
 
 	progressBar.width = progressBar.width - 0.054
@@ -127,7 +140,7 @@ local function joinTables(t1, t2)
 	end 
  
 	return t1
- end
+end
 
 local function loadWords(category)
 	-- local category = composer.getVariable( "selectedCategory" )
@@ -177,22 +190,6 @@ local function shuffling (tab)
 		local random2 = math.random(#tab)
 		tab[random1], tab[random2] = tab[random2], tab[random1]
 	end
-end
-
-local function showFinalScore()
-	display.remove(mainGroup)
-	audio.play(finishSound)
-	local resultTitle = display.newText(backGroup, "Great job!", display.contentCenterX, 100, display.contentWidth - 100, 0, "CHOWFUN_.ttf", 28)
-	resultTitle:setFillColor(0.8,0.4,0.1)
-	local scoreResult = display.newText(backGroup, "Your score is " .. score, display.contentCenterX, 160, "CHOWFUN_.ttf", 36)
-	scoreResult:setFillColor(0.8,0.4,0.1)
-
-	if score > playerData.scoresWordtest[categoryNumber] then
-		resultTitle.text = "New highscore!"
-		playerData.scoresWordtest[categoryNumber] = score
-		loadsave.saveTable(playerData, "playerData.json")
-	end
-	finishButton.isVisible = true
 end
 
 local function createQuestion(isEnglish)
@@ -321,7 +318,9 @@ local function listener1( obj )
 	obj.alpha = 1
 	obj.xScale = 1
 	obj.yScale = 1
-	obj:setFillColor(0.8,0.4,0.1)
+	if obj ~= nil and centiSecondsLeft > 0 then 
+		obj:setFillColor(0.8,0.4,0.1) 
+	end
 	evaluateAnswer(obj)	
 	hideShowIncorrectAnswers(1)
 end
@@ -334,23 +333,21 @@ local function buttonHandler( event )
 			event.target:setFillColor(0,1,0)
 			hideShowIncorrectAnswers(0)
 			transition.to( event.target, { time=1000, alpha=0, xScale=(3), yScale=(3), onComplete=listener1 } )
-		else	
+		elseif event.target.isCorrect ~= nil then
 			event.target:setFillColor(1,0,0)
-			-- event.target.xScale = 0.85 
-			-- event.target.yScale = 0.85
 			transition.to( event.target, { time=300, xScale=(0.85), yScale=(0.85), onComplete=listener1 } )
+		else
+			event.target.xScale = 0.85 
+			event.target.yScale = 0.85
 		end		
 	
-	elseif (event.phase == "moved") then
-	
-		--something
-	
+	elseif (event.phase == "moved") then	
+		--something	
 	elseif (event.phase == "ended" or event.phase == "cancelled") then
 		
-		-- event.target.xScale = 1 -- Re-scale the button on touch release 
-		-- event.target.yScale = 1
-
 		if event.target.id == "finish" then
+			event.target.xScale = 1 -- Re-scale the button on touch release 
+			event.target.yScale = 1
 			composer.gotoScene( "menu", { time=400, effect="zoomInOutFade" } )
 		else
 			-- evaluateAnswer(event)
@@ -533,7 +530,9 @@ function scene:create( event )
 	incorrectSound = {audio.loadSound( "audio/blip01.mp3" ), audio.loadSound("audio/blip04.mp3"), audio.loadSound("audio/laugh.mp3") }
 	finishSound = audio.loadSound( "audio/crrect_answer3.mp3")
 	-- tryagainSound = audio.loadSound( "audio/laugh.mp3")
-
+	musicTrack = audio.loadStream("audio/miyako_japan2.mp3")
+	audio.stop(1)
+	
 	Runtime:addEventListener("key", onKeyEvent)
 end
 
@@ -549,7 +548,7 @@ function scene:show( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
-
+		audio.play( musicTrack, { channel=1, loops=-1 } )
 	end
 end
 
@@ -567,6 +566,7 @@ function scene:hide( event )
 		-- Code here runs immediately after the scene goes entirely off screen
 		Runtime:removeEventListener("key", onKeyEvent)
 		composer.removeScene( "game" )
+		audio.stop(1)
 	end
 end
 
@@ -579,6 +579,7 @@ function scene:destroy( event )
 	audio.dispose(correctSound)
 	audio.dispose(incorrectSound)
 	audio.dispose(finishSound)
+	audio.dispose(musicTrack)
 end
 
 
