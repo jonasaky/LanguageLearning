@@ -4,12 +4,14 @@ local composer = require( "composer" )
 local scene = composer.newScene()
 
 local widget = require("widget")
+
+local styledText = require("styledText")
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 local wordsNumber, wordsGroup
-local words20Button, words30Button, words50Button, words100Button
+local words20Button, words30Button, words40Button, words50Button
 local pickerWheel
 local columnData = 
 { 
@@ -40,18 +42,18 @@ local function buttonHandler( event )
 
 		words20Button:setFillColor(0.8,0.4,0.1)
 		words30Button:setFillColor(0.8,0.4,0.1)
+		words40Button:setFillColor(0.8,0.4,0.1)
 		words50Button:setFillColor(0.8,0.4,0.1)
-		words100Button:setFillColor(0.8,0.4,0.1)
 		event.target:setFillColor(0.8,0.1,0.1)
 		
 		if event.target.id == "20" then
 			wordsNumber = 20
 		elseif event.target.id == "30" then
 			wordsNumber = 30
-		elseif event.target.id == "50" then
+		elseif event.target.id == "40" then
+			wordsNumber = 40
+		elseif event.target.id == "50"	then
 			wordsNumber = 50
-		elseif event.target.id == "100"	then
-			wordsNumber = 100
 		else
 			local values = pickerWheel:getValues()
 			wordsGroup = values[1].value
@@ -76,7 +78,7 @@ function scene:create( event )
 	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
 	backcolor:setFillColor( 1, 0.85, 0.6 )
 
-	local titleText = display.newText( sceneGroup, "Word test", 10, 0, "CHOWFUN_.ttf", 24 )
+	local titleText = display.newText( sceneGroup, "Word test", 10, 0, "CHOWFUN_.ttf", 24 )	
 	local gradient = {
 		type="gradient",
 		color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
@@ -90,17 +92,17 @@ function scene:create( event )
 	local selectWordText = display.newText( sceneGroup, "Number of words:", display.contentCenterX, 230, "CHOWFUN_.ttf", 16)	
 	words20Button = display.newText( sceneGroup, "20", 50, 250, "CHOWFUN_.ttf", 16)	
 	words30Button = display.newText (sceneGroup, "30", 120, 250, "CHOWFUN_.ttf", 16)
-	words50Button = display.newText (sceneGroup, "50", 190, 250, "CHOWFUN_.ttf", 16)
-	words100Button = display.newText (sceneGroup, "100", 260, 250, "CHOWFUN_.ttf", 16)
+	words40Button = display.newText (sceneGroup, "40", 190, 250, "CHOWFUN_.ttf", 16)
+	words50Button = display.newText (sceneGroup, "50", 260, 250, "CHOWFUN_.ttf", 16)
 	selectWordText:setFillColor(0.8,0.4,0.1)
 	words20Button:setFillColor(0.8,0.1,0.1)
 	words30Button:setFillColor(0.8,0.4,0.1)
+	words40Button:setFillColor(0.8,0.4,0.1)
 	words50Button:setFillColor(0.8,0.4,0.1)
-	words100Button:setFillColor(0.8,0.4,0.1)
 	words20Button.id = "20"
 	words30Button.id = "30"
+	words40Button.id = "40"
 	words50Button.id = "50"
-	words100Button.id = "100"
 	wordsNumber = 20 --default selected
 
 	local selectionText = display.newText( sceneGroup, "Please select one group:", display.contentCenterX, 280, "CHOWFUN_.ttf", 16)	
@@ -127,8 +129,8 @@ function scene:create( event )
 	playButton:addEventListener( "touch", buttonHandler )
 	words20Button:addEventListener( "touch", buttonHandler )
 	words30Button:addEventListener( "touch", buttonHandler )
+	words40Button:addEventListener( "touch", buttonHandler )
 	words50Button:addEventListener( "touch", buttonHandler )
-	words100Button:addEventListener( "touch", buttonHandler )
 end
 
 

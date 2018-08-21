@@ -12,15 +12,68 @@ playerData = loadsave.loadTable("playerData.json")
 -- -----------------------------------------------------------------------------------
 
 local musicTrack
+local highscoresText, subtitleText, yourScoreText, scorePoints, countdownContent, subtitles
+local scorePointsText, wordtestPoints
+local nextPageButton, previousPageButton
+local currentPage = 1
 
 -- local function gotoMenu()
 --     composer.gotoScene( "menu", { time=600, effect="crossFade" } )
 -- end
 
+local function listener1( obj )	
+	currentPage = currentPage + 1
+	if currentPage == 5 then
+		nextPageButton.isVisible = false
+	end
+
+	subtitleText.text = subtitles[currentPage]
+	scorePoints.text = wordtestPoints[currentPage]
+	
+	previousPageButton.isVisible = true
+	
+	transition.to( subtitleText, { time=500, alpha=1  })
+	transition.to( yourScoreText, { time=500, alpha=1 })
+	transition.to( previousPageButton, { time=500, alpha=1 })
+	transition.to( scorePoints, { time=500, alpha=1 })	
+end
+
+local function listener2( obj )	
+	currentPage = currentPage - 1
+	if currentPage == 1 then
+		previousPageButton.isVisible = false
+	end
+
+	subtitleText.text = subtitles[currentPage]
+	scorePoints.text = wordtestPoints[currentPage]
+	
+	nextPageButton.isVisible = true
+
+	transition.to( subtitleText, { time=500, alpha=1  })
+	transition.to( yourScoreText, { time=500, alpha=1 })
+	transition.to( nextPageButton, { time=500, alpha=1 })
+	transition.to( scorePoints, { time=500, alpha=1 })		
+end
+
 local function buttonHandler( event )
 
 	if (event.phase == "began") then  
-	
+		if event.target.id == "nextPage" then
+			
+			-- transition.to( event.target, { time=500, alpha=0,  onComplete=listener1 } )
+			transition.to( subtitleText, { time=500, alpha=0,  } )
+			transition.to( yourScoreText, { time=500, alpha=0, } )
+			transition.to( scorePoints, { time=500, alpha=0,  onComplete=listener1 } )
+			
+		else
+			
+			-- transition.to( event.target, { time=500, alpha=0,  onComplete=listener2 } )
+			transition.to( subtitleText, { time=500, alpha=0,  } )
+			transition.to( yourScoreText, { time=500, alpha=0, } )
+			transition.to( scorePoints, { time=500, alpha=0,  onComplete=listener2 } )
+			
+		end
+
 		event.target.xScale = 0.85 -- Scale the button on touch down so user knows its pressed
 		event.target.yScale = 0.85
 	
@@ -33,7 +86,7 @@ local function buttonHandler( event )
 		event.target.xScale = 1 -- Re-scale the button on touch release 
 		event.target.yScale = 1
 
-		composer.gotoScene( "menu", { time=400, effect="zoomInOutFade" } )
+		-- composer.gotoScene( "menu", { time=400, effect="zoomInOutFade" } )
 		
 	end
 	
@@ -56,35 +109,58 @@ function scene:create( event )
 	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
 	backcolor:setFillColor( 1, 0.85, 0.6 )
     
-	local highscoresText = display.newText(sceneGroup, "Highscores", display.contentCenterX, 0, "CHOWFUN_.ttf", 40)
+	highscoresText = display.newText(sceneGroup, "Highscores", display.contentCenterX, 0, "CHOWFUN_.ttf", 40)
 	local gradient = {
 		type="gradient",
 		color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
 	}
 	highscoresText:setFillColor(gradient)
 	
-	local subtitleText = display.newText(sceneGroup, "Countdown", display.contentCenterX, 50, "CHOWFUN_.ttf", 24)
+	countdownContent = "Junior High 1 year__\n  Noun: \n  Verb: \n  Adjective & Adverb: \nJunior High 2 year__\n  Noun: \n  Verb: \n  Adjective & Adverb: \nJunior High 3 year__\n  Noun: \n  Verb: \n  Adjective & Adverb: "
+	
+	subtitles = {"Countdown", "Word Test - 20 Words", "Word Test - 30 Words", "Word Test - 40 Words", "Word Test - 50 Words"}
+	subtitleText = display.newText(sceneGroup, subtitles[1], display.contentCenterX, 50, "CHOWFUN_.ttf", 24)
 	subtitleText:setFillColor(0.8,0.4,0.1)
-	local yourScoreText = display.newText(sceneGroup, "Junior High 1 year__\n  Noun: \n  Verb: \n  Adjective & Adverb: \nJunior High 2 year__\n  Noun: \n  Verb: \n Adjective & Adverb: \nJunior High 3 year__\n  Noun: \n  Verb: \n Adjective & Adverb: ", 10, 240, "CHOWFUN_.ttf", 20)
+	yourScoreText = display.newText(sceneGroup, countdownContent, 10, 240, "CHOWFUN_.ttf", 20)
 	yourScoreText.anchorX = 0
 	yourScoreText:setFillColor(0.8,0.4,0.1)
 
-	local scorePointsText = "\n"
+	scorePointsText = "\n"
 	for i = 1, #playerData.scores do
 		scorePointsText = scorePointsText .. playerData.scores[i] .. "\n"
 		if i == 3 or i == 6 then
 			scorePointsText = scorePointsText .. "\n"
 		end
 	end
-	local scorePoints = display.newText(sceneGroup, scorePointsText, display.contentWidth - 30, 255, "CHOWFUN_.ttf", 20)
+
+	wordtestPoints = {scorePointsText}
+	local categoryCounter = 2
+	wordtestPoints[categoryCounter] = "\n"
+	for i = 1, #playerData.scoresWordtest do		
+		wordtestPoints[categoryCounter] = wordtestPoints[categoryCounter] .. playerData.scoresWordtest[i] .. "\n"
+		if i == 3 or i == 6 or i == 12 or i == 15 or i == 21 or i == 24 or i == 30 or i == 33 then
+			wordtestPoints[categoryCounter] = wordtestPoints[categoryCounter] .. "\n"
+		elseif i == 9 or i == 18 or i == 27 then
+			categoryCounter = categoryCounter + 1
+			wordtestPoints[categoryCounter] = "\n"
+		end		
+	end
+	scorePoints = display.newText(sceneGroup, scorePointsText, display.contentWidth - 30, 255, "CHOWFUN_.ttf", 20)
 	scorePoints:setFillColor(0.9,0.4,0.1)
 
-	-- local goBackButton = display.newText(sceneGroup, "Go Back", display.contentCenterX, display.contentHeight, native.SystemFont, 30)
-	-- goBackButton:setFillColor( .6,.6,1 )
-	local goBackButton = display.newImageRect(sceneGroup, "backBtn.png", 174, 63)
-	goBackButton.x, goBackButton.y = display.contentCenterX, display.contentHeight
+	-- local nextPageButton = display.newText(sceneGroup, "Go Back", display.contentCenterX, display.contentHeight, native.SystemFont, 30)
+	-- nextPageButton:setFillColor( .6,.6,1 )
+	nextPageButton = display.newImageRect(sceneGroup, "nextpage.png", 82, 38)
+	nextPageButton.x, nextPageButton.y = display.contentWidth - 50, display.contentHeight
+	nextPageButton.id = "nextPage"
 
-	goBackButton:addEventListener("touch", buttonHandler)
+	previousPageButton = display.newImageRect(sceneGroup, "previouspage.png", 130, 50)
+	previousPageButton.x, previousPageButton.y = 80, display.contentHeight
+	previousPageButton.id = "previousPage"
+	previousPageButton.isVisible = false
+
+	nextPageButton:addEventListener("touch", buttonHandler)
+	previousPageButton:addEventListener("touch", buttonHandler)
 end
 
 

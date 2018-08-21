@@ -100,7 +100,7 @@ local function showFinalScore()
 	local scoreResult = display.newText(backGroup, " Your score　\nExcellent: " .. score .. "\nGood: " .. scoreGood .. "\nBad: " .. badScore, display.contentCenterX, 160, "CHOWFUN_.ttf", 30)
 	scoreResult:setFillColor(0.8,0.4,0.1)
 
-	if gameMode == "wordtest" then
+	if gameMode == "wordTest" then
 		if score > playerData.scoresWordtest[categoryNumber] then
 			resultTitle.text = "New highscore!"
 			playerData.scoresWordtest[categoryNumber] = score
@@ -471,17 +471,38 @@ function scene:create( event )
 	if gameMode == "wordTest" then
 		-- total = event.params["wordsNumber"]
 		print(event.params["selectedTotalWords"])
-		if event.params["selectedTotalWords"] == 20 then
+		local totalWords = event.params["selectedTotalWords"]
+		local selectedCategory = event.params["selectedCategory"]
+				
+		if selectedCategory == "Jr High 1 year Noun" then
 			categoryNumber = 1
-		elseif event.params["selectedTotalWords"] == 30 then
+		elseif selectedCategory == "Jr High 1 year Verb" then
 			categoryNumber = 2
-		elseif event.params["selectedTotalWords"] == 50 then
+		elseif selectedCategory == "Jr High 1 year Adj & Adv" then
 			categoryNumber = 3
-		else
+		elseif selectedCategory == "Jr High 2 year Noun" then
 			categoryNumber = 4
+		elseif selectedCategory == "Jr High 2 year Verb" then
+			categoryNumber = 5
+		elseif selectedCategory == "Jr High 2 year Adj" then
+			categoryNumber = 6
+		elseif selectedCategory == "Jr High 3 year Noun" then
+			categoryNumber = 7
+		elseif selectedCategory == "Jr High 3 year Verb" then
+			categoryNumber = 8
+		elseif selectedCategory == "Jr High 3 year Adj & Adv" then
+			categoryNumber = 9
 		end
 
-		total = event.params["selectedTotalWords"]
+		if totalWords == 30 then
+			categoryNumber = categoryNumber + 9
+		elseif totalWords == 40 then
+			categoryNumber = categoryNumber + 18
+		elseif totalWords == 50 then
+			categoryNumber = categoryNumber + 27
+		end
+		
+		total = totalWords
 	else
 		total = #wordsTable
 	end

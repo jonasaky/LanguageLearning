@@ -26,7 +26,7 @@ settingsData = loadsave.loadTable("settingsData.json")
 if(playerData == nil) then 
 	newPlayer = {}
 	newPlayer["scores"] = {0,0,0,0,0,0,0,0,0}
-	newPlayer["scoresWordtest"] = {0,0,0,0}
+	newPlayer["scoresWordtest"] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 	newPlayer["username"] = "user" .. math.random(1000, 9999)
 	loadsave.saveTable(newPlayer, "playerData.json")
 end
