@@ -107,14 +107,16 @@ function scene:create( event )
     -- 	background.x = math.floor(display.contentWidth / 2)
 	-- 	background.y = math.floor( display.contentHeight / 2)
 	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
-	backcolor:setFillColor( 1, 0.85, 0.6 )
+	backcolor:setFillColor( 1, 0.86, 0.6 )
     
-	highscoresText = display.newText(sceneGroup, "Highscores", display.contentCenterX, 0, "CHOWFUN_.ttf", 40)
-	local gradient = {
-		type="gradient",
-		color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
-	}
-	highscoresText:setFillColor(gradient)
+	-- highscoresText = display.newText(sceneGroup, "Highscores", display.contentCenterX, 0, "CHOWFUN_.ttf", 40)
+	-- local gradient = {
+	-- 	type="gradient",
+	-- 	color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
+	-- }
+	-- highscoresText:setFillColor(gradient)
+	highscoresText = display.newImageRect(sceneGroup, "title_highscores.png", 194,55)
+	highscoresText.x = display.contentCenterX
 	
 	countdownContent = "Junior High 1 year__\n  Noun: \n  Verb: \n  Adjective & Adverb: \nJunior High 2 year__\n  Noun: \n  Verb: \n  Adjective & Adverb: \nJunior High 3 year__\n  Noun: \n  Verb: \n  Adjective & Adverb: "
 	

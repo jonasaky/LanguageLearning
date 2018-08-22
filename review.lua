@@ -43,7 +43,7 @@ function scene:create( event )
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
 	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
-	backcolor:setFillColor( 1, 0.85, 0.6 )
+	backcolor:setFillColor( 1, 0.86, 0.6 )
 
 	local titleText = display.newText( sceneGroup, "Review", 10, 0, "CHOWFUN_.ttf", 24 )
 	local gradient = {

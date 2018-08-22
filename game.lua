@@ -432,7 +432,7 @@ function scene:create( event )
     -- 	background.x = math.floor(display.contentWidth / 2)
 	-- 	background.y = math.floor( display.contentHeight / 2)
 	local backcolor = display.newRect( backGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
-	backcolor:setFillColor( 1, 0.85, 0.6 )
+	backcolor:setFillColor( 1, 0.86, 0.6 )
 
 	if gameMode == "countDown" then
 		progressBar = display.newRect(mainGroup, 0, 0, display.contentWidth, 5)

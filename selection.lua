@@ -46,25 +46,36 @@ function scene:create( event )
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
 	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
-	backcolor:setFillColor( 1, 0.85, 0.6 )
+	backcolor:setFillColor( 1, 0.86, 0.6 )
 
-	local titleText = display.newText( sceneGroup, "Selection Mode", display.contentCenterX, 0, "CHOWFUN_.ttf", 24 )
-	local gradient = {
-		type="gradient",
-		color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
-	}
-	titleText:setFillColor(gradient)
-	
-	local option1Text = display.newText( sceneGroup, "Word test", display.contentCenterX, 350, "CHOWFUN_.ttf", 24 )
-	option1Text:setFillColor(0.8,0.4,0.1)
+	-- local titleText = display.newText( sceneGroup, "Selection Mode", display.contentCenterX, 0, "CHOWFUN_.ttf", 24 )
+	-- local gradient = {
+	-- 	type="gradient",
+	-- 	color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
+	-- }
+	-- titleText:setFillColor(gradient)
+	local titleText = display.newImageRect(sceneGroup, "selectionMode_title.png", 201, 39)
+	titleText.x = display.contentCenterX
+
+	-- local option1Text = display.newText( sceneGroup, "Word test", display.contentCenterX, 350, "CHOWFUN_.ttf", 24 )
+	-- option1Text:setFillColor(0.8,0.4,0.1)
+	-- option1Text.id = "option1"
+	local option1Text = display.newImageRect(sceneGroup, "selection_wordTest.png", 136, 39)
+	option1Text.x, option1Text.y = display.contentCenterX, 350
 	option1Text.id = "option1"
 
-	local option2Text = display.newText( sceneGroup, "Countdown", display.contentCenterX, 400, "CHOWFUN_.ttf", 24 )
-	option2Text:setFillColor(0.8,0.4,0.1)
+	-- local option2Text = display.newText( sceneGroup, "Countdown", display.contentCenterX, 400, "CHOWFUN_.ttf", 24 )
+	-- option2Text:setFillColor(0.8,0.4,0.1)
+	-- option2Text.id = "option2"
+	local option2Text = display.newImageRect(sceneGroup, "selection_countdown.png", 156, 38)
+	option2Text.x, option2Text.y = display.contentCenterX, 400
 	option2Text.id = "option2"
 
-	local option3Text = display.newText( sceneGroup, "Review", display.contentCenterX, 450, "CHOWFUN_.ttf", 24 )
-	option3Text:setFillColor(0.8,0.4,0.1)
+	-- local option3Text = display.newText( sceneGroup, "Review", display.contentCenterX, 450, "CHOWFUN_.ttf", 24 )
+	-- option3Text:setFillColor(0.8,0.4,0.1)
+	-- option3Text.id = "option3"
+	local option3Text = display.newImageRect(sceneGroup, "selection_review.png", 105, 38)
+	option3Text.x, option3Text.y = display.contentCenterX, 450
 	option3Text.id = "option3"
 
 	option1Text:addEventListener( "touch", buttonHandler )

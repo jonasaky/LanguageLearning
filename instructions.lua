@@ -88,7 +88,7 @@ function scene:create( event )
     -- 	background.x = math.floor(display.contentWidth / 2)
 	-- 	background.y = math.floor( display.contentHeight / 2)
 	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
-	backcolor:setFillColor( 1, 0.85, 0.6 )
+	backcolor:setFillColor( 1, 0.86, 0.6 )
 
 	local titleText = display.newText( sceneGroup, "Description", 10, 0, "CHOWFUN_.ttf", 24 )
 	local gradient = {

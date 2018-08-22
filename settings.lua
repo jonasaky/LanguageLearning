@@ -91,14 +91,16 @@ function scene:create( event )
     -- 	background.x = math.floor(display.contentWidth / 2)
 	-- 	background.y = math.floor( display.contentHeight / 2)
 	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
-	backcolor:setFillColor( 1, 0.85, 0.6 )
+	backcolor:setFillColor( 1, 0.86, 0.6 )
     
-	local settingsText = display.newText(sceneGroup, "Settings", display.contentCenterX, 0, "CHOWFUN_.ttf", 40)
-	local gradient = {
-		type="gradient",
-		color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
-	}
-	settingsText:setFillColor(gradient)
+	-- local settingsText = display.newText(sceneGroup, "Settings", display.contentCenterX, 0, "CHOWFUN_.ttf", 40)
+	-- local gradient = {
+	-- 	type="gradient",
+	-- 	color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
+	-- }
+	-- settingsText:setFillColor(gradient)
+	local settingsText = display.newImageRect(sceneGroup, "title_settings.png", 156,53)
+	settingsText.x = display.contentCenterX
 
 	local nickNameLabel = display.newText(sceneGroup, "Your nickname:", display.contentCenterX, 100, "CHOWFUN_.ttf", 24)
 	nickNameLabel:setFillColor(0.8,0.4,0.1)
@@ -143,10 +145,10 @@ function scene:create( event )
 	)
 	sceneGroup:insert(onOffVolume)
 
-	local goBackButton = display.newText(sceneGroup, "Save changes", display.contentCenterX, display.contentHeight, "CHOWFUN_.ttf", 30)
-	goBackButton:setFillColor(0.8,0.4,0.1)
-	-- local goBackButton = display.newImageRect(sceneGroup, "backBtn.png", 174, 63)
-	-- goBackButton.x, goBackButton.y = display.contentCenterX, display.contentHeight
+	-- local goBackButton = display.newText(sceneGroup, "Save changes", display.contentCenterX, display.contentHeight, "CHOWFUN_.ttf", 30)
+	-- goBackButton:setFillColor(0.8,0.4,0.1)
+	local goBackButton = display.newImageRect(sceneGroup, "btn_saveChanges.png", 176, 44)
+	goBackButton.x, goBackButton.y = display.contentCenterX, display.contentHeight
 
 	goBackButton:addEventListener("touch", buttonHandler)
 end
