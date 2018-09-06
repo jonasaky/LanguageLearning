@@ -98,7 +98,7 @@ function scene:create( event )
 	titleText.anchorX = 0
 	titleText:setFillColor(gradient)
 	local descriptionText = display.newText( sceneGroup, "This is a multiple choice word translation game. You need to tap the correct answer. " ..
-		"If you fail you can try again until you have the correct answer. \nTry to get as many as possible correct answers in 1 minute!!", display.contentCenterX, 120, 300, 0, "CHOWFUN_.ttf", 18)
+		"If you fail you can try again until you have the correct answer. \nTry to get as many as possible correct answers in 1 minute!", display.contentCenterX, 120, 300, 0, "Segoe UI", 20)
 	descriptionText:setFillColor(0.8,0.4,0.1)
 	-- local systemFonts = native.getFontNames() 
 	-- local searchString = "pt"
@@ -110,12 +110,12 @@ function scene:create( event )
 	-- 		print( "Font Name = " .. tostring( fontName ) )
 	-- 	end
 	-- end
-	local selectionText = display.newText( sceneGroup, "Please select one group:", display.contentCenterX, 250, "CHOWFUN_.ttf", 16)	
+	local selectionText = display.newText( sceneGroup, "Please select one group:", display.contentCenterX, 275, "CHOWFUN_.ttf", 16)	
 	selectionText:setFillColor(0.8,0.4,0.1)
 	pickerWheel = widget.newPickerWheel(
 	{
 		left = display.contentWidth - display.contentWidth * 0.9,
-		top = 260,
+		top = 290,
 		columns = columnData,
 		style = "resizable",
 		width = display.contentWidth * 0.8,
@@ -126,13 +126,13 @@ function scene:create( event )
 	})
 	sceneGroup:insert(pickerWheel)
 
-	countDownText = display.newText(sceneGroup, countDown, display.contentCenterX,display.contentHeight - 50, "CHOWFUN_.ttf", 40)
+	countDownText = display.newText(sceneGroup, countDown, display.contentCenterX,display.contentHeight, "CHOWFUN_.ttf", 40)
 	countDownText:setFillColor(0.8,0.4,0.1)
 	countDownText.isVisible = false
 
-	playButton = display.newImageRect( sceneGroup, "play_btn.png", 200,71)
+	playButton = display.newImageRect( sceneGroup, "startBtn.png", 118,47)
 	playButton.x = display.contentCenterX
-	playButton.y = display.contentHeight - 60
+	playButton.y = display.contentHeight
 	-- playButton.xScale = 0.4
 	-- playButton.yScale = 0.4
 	playButton.id = "play"

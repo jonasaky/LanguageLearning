@@ -5,7 +5,8 @@
 -----------------------------------------------------------------------------------------
 
 local composer = require( "composer" )
- 
+local notifications = require( "plugin.notifications.v2" )
+
 -- Hide status bar
 display.setStatusBar( display.HiddenStatusBar )
  
@@ -61,6 +62,46 @@ local function onKeyEvent( event )
 	return true
 end
 Runtime:addEventListener( "key", onKeyEvent );
+
+-- Get the app's launch arguments in case it was started when the user tapped on a notification
+local launchArgs = ...
+
+-- Set up notification options
+local options = {
+    alert = "Wake up!",
+    badge = 2,
+    sound = "alarm.caf",
+    custom = { foo = "bar" }
+}
+
+-- Schedule a notification to occur 60 seconds from now
+local notification1 = notifications.scheduleNotification( 60, options )
+
+-- Schedule a notification using Coordinated Universal Time (UTC)
+local utcTime = os.date( "!*t", os.time() + 60 )
+local notification2 = notifications.scheduleNotification( utcTime, options )
+
+local function notificationListener( event )
+ 
+    if ( event.type == "remote" ) then
+        -- Handle the push notification
+ 
+    elseif ( event.type == "local" ) then
+        -- Handle the local notification
+		print( event.name )
+		if ( event.custom ) then
+			print( event.custom.foo )
+		end
+    end
+end
+ 
+Runtime:addEventListener( "notification", notificationListener )
+
+-- The launch arguments provide a notification event if this app was started when the user tapped on a notification
+-- In this case, you must call the notification listener manually
+if ( launchArgs and launchArgs.notification ) then
+    onNotification( launchArgs.notification )
+end
 
 -- Go to the menu screen
 composer.gotoScene( "menu" )

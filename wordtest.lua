@@ -78,22 +78,24 @@ function scene:create( event )
 	local backcolor = display.newRect( sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight + 100 )
 	backcolor:setFillColor( 1, 0.86, 0.6 )
 
-	local titleText = display.newText( sceneGroup, "Word test", 10, 0, "CHOWFUN_.ttf", 24 )	
-	local gradient = {
-		type="gradient",
-		color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
-	}
-	titleText.anchorX = 0
-	titleText:setFillColor(gradient)
+	-- local titleText = display.newText( sceneGroup, "Word test", 10, 0, "CHOWFUN_.ttf", 24 )	
+	-- local gradient = {
+	-- 	type="gradient",
+	-- 	color1={ 0.8,0.3,0.1 }, color2={ 0.8, 0.6, 0.1 }, direction="down"
+	-- }
+	-- titleText.anchorX = 0
+	-- titleText:setFillColor(gradient)
+	local titleText = display.newImageRect(sceneGroup, "selection_wordTest.png", 136, 39)
+	titleText.x = 70
 	local descriptionText = display.newText( sceneGroup, "This is a multiple choice word translation game. You need to tap the correct answer. " ..
-		"If you fail you can try again until you have the correct answer. \nDepending of your number of tries is the score points you get!!", display.contentCenterX, 120, 300, 0, "CHOWFUN_.ttf", 18)
+		"If you fail you can try again until you have the correct answer. \nDepending of your number of tries is the score points you get!", display.contentCenterX, 120, 300, 0, "Segoe UI", 20)
 	descriptionText:setFillColor(0.8,0.4,0.1)
 
-	local selectWordText = display.newText( sceneGroup, "Number of words:", display.contentCenterX, 230, "CHOWFUN_.ttf", 16)	
-	words20Button = display.newText( sceneGroup, "20", 50, 250, "CHOWFUN_.ttf", 16)	
-	words30Button = display.newText (sceneGroup, "30", 120, 250, "CHOWFUN_.ttf", 16)
-	words40Button = display.newText (sceneGroup, "40", 190, 250, "CHOWFUN_.ttf", 16)
-	words50Button = display.newText (sceneGroup, "50", 260, 250, "CHOWFUN_.ttf", 16)
+	local selectWordText = display.newText( sceneGroup, "Number of words:", display.contentCenterX, 240, "CHOWFUN_.ttf", 16)	
+	words20Button = display.newText( sceneGroup, "20", 50, 260, "CHOWFUN_.ttf", 16)	
+	words30Button = display.newText (sceneGroup, "30", 120, 260, "CHOWFUN_.ttf", 16)
+	words40Button = display.newText (sceneGroup, "40", 190, 260, "CHOWFUN_.ttf", 16)
+	words50Button = display.newText (sceneGroup, "50", 260, 260, "CHOWFUN_.ttf", 16)
 	selectWordText:setFillColor(0.8,0.4,0.1)
 	words20Button:setFillColor(0.8,0.1,0.1)
 	words30Button:setFillColor(0.8,0.4,0.1)
@@ -105,12 +107,12 @@ function scene:create( event )
 	words50Button.id = "50"
 	wordsNumber = 20 --default selected
 
-	local selectionText = display.newText( sceneGroup, "Please select one group:", display.contentCenterX, 280, "CHOWFUN_.ttf", 16)	
+	local selectionText = display.newText( sceneGroup, "Please select one group:", display.contentCenterX, 290, "CHOWFUN_.ttf", 16)	
 	selectionText:setFillColor(0.8,0.4,0.1)
 	pickerWheel = widget.newPickerWheel(
 	{
 		left = display.contentWidth - display.contentWidth * 0.9,
-		top = 290,
+		top = 300,
 		columns = columnData,
 		style = "resizable",
 		width = display.contentWidth * 0.8,
@@ -123,7 +125,7 @@ function scene:create( event )
 
 	local playButton = display.newImageRect(sceneGroup, "startBtn.png", 118, 47)
 	playButton.x = display.contentCenterX
-	playButton.y = 450
+	playButton.y = display.contentHeight
 	playButton.id = "play"
 
 	playButton:addEventListener( "touch", buttonHandler )

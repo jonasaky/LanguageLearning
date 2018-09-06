@@ -74,9 +74,7 @@ function scene:create( event )
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
 	backGroup = display.newGroup()
-	sceneGroup:insert(backGroup)
-	musicTrack = audio.loadStream("audio/miyako-japan3.mp3")
-	audio.play( musicTrack, { channel=1, loops=-1 } ) -- Start the music!
+	sceneGroup:insert(backGroup)	
 
 	background = display.newImageRect(backGroup, "sakura_wallpaper.jpg", 424.8, 754.2) -- add a background
     background.x = math.floor(display.contentWidth / 2)
@@ -122,7 +120,7 @@ function scene:create( event )
 	highScoresButton:addEventListener( "touch", buttonHandler )
 	settingsButton:addEventListener("touch", buttonHandler )
 
-	
+	musicTrack = audio.loadStream("audio/miyako-japan3.mp3")
 end
 
 
@@ -137,6 +135,7 @@ function scene:show( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen		
+		audio.play( musicTrack, { channel=1, loops=-1 } ) -- Start the music!
 	end
 end
 

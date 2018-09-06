@@ -53,7 +53,7 @@ function scene:create( event )
 	titleText.anchorX = 0
 	titleText:setFillColor(gradient)
 	local descriptionText = display.newText( sceneGroup, "For all those difficult words you got hard time, here is the perfect place to review and practice. " ..
-		"If you think you have mastered a word you can mark as completed. \nRemember this is based on your answers when you play 'word test' and 'countdown'", display.contentCenterX, 150, 300, 0, "CHOWFUN_.ttf", 18)
+		"\n\nRemember this review content is based on your answers when you play 'word test' and 'countdown'", display.contentCenterX, 120, 300, 0, "Segoe UI", 20)
 	descriptionText:setFillColor(0.8,0.4,0.1)
 
 	local playButton = display.newImageRect(sceneGroup, "startBtn.png", 118, 47)

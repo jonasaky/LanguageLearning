@@ -18,9 +18,11 @@ settings =
 	--
 	android =
 	{
+		useGoogleServicesJson = true,
 		usesPermissions =
 		{
-			"android.permission.INTERNET",
+			-- "android.permission.INTERNET",
+			"android.permission.RECEIVE_BOOT_COMPLETED",
 		},
 	},
 
@@ -42,7 +44,10 @@ settings =
 	--
 	plugins =
 	{
-
+		["plugin.notifications.v2"] =
+        {
+            publisherId = "com.coronalabs"
+        },
 	},
 
 	--
