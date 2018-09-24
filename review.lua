@@ -66,13 +66,13 @@ function scene:create( event )
 	descriptionText:setFillColor(0.8,0.4,0.1)
 	
 	difficultWordsTable = loadsave.loadTable("difficultWords.json")
-	if difficultWordsTable then
-		isValidToPlay = true
-	else
+	if difficultWordsTable == nil or next(difficultWordsTable) == nil then
 		warningText = display.newText( sceneGroup, "You don't have words to review, come back later", display.contentCenterX, display.contentCenterY + 150, 260, 0, "Segoe UI", 16)
 		warningText:setFillColor(0.8,0.4,0.1)
 		warningText.align = "center"
-		warningText.alpha = 0
+		warningText.alpha = 0		
+	else
+		isValidToPlay = true
 	end
 
 	local playButton = display.newImageRect(sceneGroup, "startBtn.png", 118, 47)
