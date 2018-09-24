@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "461832953098",
+    "firebase_url": "https://language-learning-f0963.firebaseio.com",
+    "project_id": "language-learning-f0963",
+    "storage_bucket": "language-learning-f0963.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:461832953098:android:44effa9285e43f86",
+        "android_client_info": {
+          "package_name": "mx.com.yahoo.jonas285.LanguageLearning"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "461832953098-rde1dpac93icm13f34h3r5aje7rvvsp8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJ38-XzFBRiyu9YiZLH3xCbmyFRCs-yTk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

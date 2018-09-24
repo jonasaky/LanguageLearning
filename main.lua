@@ -68,7 +68,7 @@ local launchArgs = ...
 
 -- Set up notification options
 local options = {
-    alert = "Wake up!",
+    alert = "Keep learning!",
     badge = 2,
     sound = "alarm.caf",
     custom = { foo = "bar" }
@@ -78,20 +78,18 @@ local options = {
 local notification1 = notifications.scheduleNotification( 60, options )
 
 -- Schedule a notification using Coordinated Universal Time (UTC)
-local utcTime = os.date( "!*t", os.time() + 60 )
-local notification2 = notifications.scheduleNotification( utcTime, options )
+-- local utcTime = os.date( "!*t", os.time() + 60 )
+-- local notification2 = notifications.scheduleNotification( utcTime, options )
 
-local function notificationListener( event )
- 
-    if ( event.type == "remote" ) then
-        -- Handle the push notification
- 
-    elseif ( event.type == "local" ) then
-        -- Handle the local notification
+local function notificationListener( event )		 
+    if ( event.type == "local" ) then
+		-- Handle the local notification
 		print( event.name )
 		if ( event.custom ) then
 			print( event.custom.foo )
 		end
+	else --event.type == "remote"
+		-- Handle the push notification		
     end
 end
  
@@ -100,7 +98,7 @@ Runtime:addEventListener( "notification", notificationListener )
 -- The launch arguments provide a notification event if this app was started when the user tapped on a notification
 -- In this case, you must call the notification listener manually
 if ( launchArgs and launchArgs.notification ) then
-    onNotification( launchArgs.notification )
+    notificationListener( launchArgs.notification )
 end
 
 -- Go to the menu screen

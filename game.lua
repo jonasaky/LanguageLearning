@@ -23,6 +23,7 @@ local wordsTable
 local progressBar
 local total
 local musicTrack
+local difficultWords
 
 if wordsTable == nil then
 	wordsTable = 
@@ -105,13 +106,17 @@ local function showFinalScore()
 			resultTitle.text = "New highscore!"
 			playerData.scoresWordtest[categoryNumber] = score
 			loadsave.saveTable(playerData, "playerData.json")
+			loadsave.saveTable(difficultWords, "difficultWords.json")
 		end
-	else
+	elseif gameMode == "countDown" then
 		if score > playerData.scores[categoryNumber] then
 			resultTitle.text = "New highscore!"
 			playerData.scores[categoryNumber] = score
 			loadsave.saveTable(playerData, "playerData.json")
+			loadsave.saveTable(difficultWords, "difficultWords.json")
 		end
+	else
+		-- review mode
 	end
 	finishButton.isVisible = true
 end
@@ -171,6 +176,8 @@ local function loadWords(category)
 	elseif category == "Jr High 3 year Adj & Adv" then
 		wordsTable = loadsave.loadTable("jrhigh3year_adjadv.json", system.ResourceDirectory)
 		categoryNumber = 9
+	else
+		wordsTable = {}
 	end
 end
 
@@ -185,10 +192,12 @@ local function has_value (tab, val)
 end
 
 local function shuffling (tab)
-	for i = 1, 100 do
-		local random1 = math.random(#tab)
-		local random2 = math.random(#tab)
-		tab[random1], tab[random2] = tab[random2], tab[random1]
+	if #tab > 0 then
+		for i = 1, 100 do
+			local random1 = math.random(#tab)
+			local random2 = math.random(#tab)
+			tab[random1], tab[random2] = tab[random2], tab[random1]
+		end
 	end
 end
 
@@ -199,17 +208,22 @@ local function createQuestion(isEnglish)
 	optionB.isCorrect = false
 	optionC.isCorrect = false
 	optionD.isCorrect = false
-
+	
 	local i = 1
 	local answersDisplayed = {}
-	while i <= 4 do
-		local n = math.random(#wordsTable)
-		if (has_value(answersDisplayed, n) == false) and n ~= total then
-			table.insert(answersDisplayed,n)
-			i = i + 1
+	if #wordsTable > 10 then
+		while i <= 4 do
+			print(i)
+			local n = math.random(#wordsTable)
+			if (has_value(answersDisplayed, n) == false) and n ~= total then
+				table.insert(answersDisplayed,n)
+				i = i + 1
+			end
 		end
+	else
+		answersDisplayed = {1,2,3,4}
 	end
-
+	
 	local answerText
 	if isEnglish == 1 then
 		answerText = wordsTable[total].japanese
@@ -264,13 +278,14 @@ local function evaluateAnswer( answer )
 			badScore = badScore + 1
 			badScoreText.text = "bad: " .. badScore
 			audio.play(correctSound[3])
+			table.insert(difficultWords, wordsTable[total + 1])
 		end		
 		tryCount = 0
 
 		-- correct = display.newText( mainGroup, "✔", answer.x + 40, answer.y, native.systemFont, 24)
 		-- correct:setFillColor( .2,1,0)
 
-		if gameMode == "wordTest" and total == 0 then
+		if (gameMode == "wordTest" or gameMode == "review") and total == 0 then
 			showFinalScore()
 		else
 			timer.performWithDelay( 100, function() createQuestion(math.random(2)) end )
@@ -374,8 +389,10 @@ end
 local function exitGame()
 	if gameMode == "countDown" then
 		composer.gotoScene("instructions", options)
-	else
+	elseif gameMode == "wordTest" then
 		composer.gotoScene("wordtest", options)
+	else
+		composer.gotoScene("review", options)
 	end
 end
 
@@ -463,6 +480,13 @@ function scene:create( event )
 	-- joinTables(wordsTable, nounTable)
 	loadWords(event.params["selectedCategory"])
 	shuffling(wordsTable)
+	difficultWords = loadsave.loadTable("difficultWords.json")
+	if difficultWords == nil then
+		difficultWords = {}
+	end
+	if gameMode == "review" then
+		wordsTable = difficultWords
+	end
 	
 	-- for i = 1, #wordsTable do 
 	-- 	print(wordsTable[i].english)
@@ -503,8 +527,12 @@ function scene:create( event )
 		end
 		
 		total = totalWords
+	elseif gameMode == "countDown" then
+		total = #wordsTable
 	else
 		total = #wordsTable
+		local sampleWords = loadsave.loadTable("words.json", system.ResourceDirectory)
+		joinTables(wordsTable, sampleWords)
 	end
 
 	hintText = display.newText( mainGroup, "", display.contentCenterX, 90, native.systemFont, 18)
@@ -537,9 +565,9 @@ function scene:create( event )
 	optionD = display.newText( mainGroup, "" , display.contentCenterX, 430, native.systemFont, 20 )
 	optionD:setFillColor(0.8,0.4,0.1)
 	-- optionD.anchorX = 0
-
+	print("start create question")
 	createQuestion(1)
-
+	print("finish create question")
 	finishButton:addEventListener( "touch", buttonHandler )
 
 	optionA:addEventListener( "touch", buttonHandler)

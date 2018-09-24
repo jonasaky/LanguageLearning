@@ -3,12 +3,16 @@ local composer = require( "composer" )
 
 local scene = composer.newScene()
 
+local loadsave = require("loadsave")
+
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
-
+local warningText
+local isValidToPlay = false
+local difficultWordsTable
 
 local function buttonHandler( event )
 
@@ -26,7 +30,12 @@ local function buttonHandler( event )
 		event.target.xScale = 1 -- Re-scale the button on touch release 
 		event.target.yScale = 1
 
-		composer.gotoScene("reviewGame", {time=600, effect="fromRight"})
+		if isValidToPlay then			
+			composer.gotoScene("game", { params = {gameMode = "review", selectedCategory = ""}})
+		else
+			warningText.alpha = 1
+			transition.to(warningText, {time=1500, alpha= 0})
+		end
 		
 	end
 	
@@ -55,6 +64,16 @@ function scene:create( event )
 	local descriptionText = display.newText( sceneGroup, "For all those difficult words you got hard time, here is the perfect place to review and practice. " ..
 		"\n\nRemember this review content is based on your answers when you play 'word test' and 'countdown'", display.contentCenterX, 120, 300, 0, "Segoe UI", 20)
 	descriptionText:setFillColor(0.8,0.4,0.1)
+	
+	difficultWordsTable = loadsave.loadTable("difficultWords.json")
+	if difficultWordsTable then
+		isValidToPlay = true
+	else
+		warningText = display.newText( sceneGroup, "You don't have words to review, come back later", display.contentCenterX, display.contentCenterY + 150, 260, 0, "Segoe UI", 16)
+		warningText:setFillColor(0.8,0.4,0.1)
+		warningText.align = "center"
+		warningText.alpha = 0
+	end
 
 	local playButton = display.newImageRect(sceneGroup, "startBtn.png", 118, 47)
 	playButton.x = display.contentCenterX
