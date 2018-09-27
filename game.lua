@@ -5,6 +5,8 @@ local scene = composer.newScene()
 
 local loadsave = require("loadsave")
 playerData = loadsave.loadTable("playerData.json")
+
+local widget = require( "widget" )
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -24,67 +26,6 @@ local progressBar
 local total
 local musicTrack
 local difficultWords
-
-if wordsTable == nil then
-	wordsTable = 
-	{
-		{
-			image = "apple.png",
-			english = "Apple",
-			japanese = "りんご"
-		},
-		{
-			image = "orange.png",
-			english = "Orange",
-			japanese = "オレンジ"
-		},
-		{
-			image = "melon.png",
-			english = "Melon",
-			japanese = "メロン"
-		},
-		{
-			image = "ballpen.png",
-			english = "Ballpen",
-			japanese = "ボールペン"
-		},
-		{
-			image = "flower.png",
-			english = "Flower",
-			japanese = "はな"
-		},
-		{
-			image = "tree.png",
-			english = "Tree",
-			japanese = "き"
-		},
-		{
-			image = "hair.png",
-			english = "Hair",
-			japanese = "かみ"
-		},
-		{
-			image = "head.png",
-			english = "Head",
-			japanese = "あたま"
-		},
-		{
-			image = "stomach.png",
-			english = "Stomach",
-			japanese = "おなか"
-		},
-		{
-			image = "glasses.png",
-			english = "Glasses",
-			japanese = "めがね"
-		},
-		{
-			image = "leg.png",
-			english = "Foot, leg",
-			japanese = "足（あし）"
-		}
-	}
-end
 
 local countdownTimer
 local centiSecondsLeft = 1*6000
@@ -117,6 +58,33 @@ local function showFinalScore()
 		end
 	else
 		-- review mode
+		local resetDifficultText = display.newText(backGroup, "clear the list?", display.contentCenterX - 50, display.contentHeight - 20, "Segoe UI", 24)
+		resetDifficultText:setFillColor(0.8,0.4,0.1)
+		local function resettingDifficultHandler(event)
+			print("clear button was pressed")
+			difficultWords = {}
+			loadsave.saveTable(difficultWords, "difficultWords.json")
+			event.target.isVisible = false
+			resetDifficultText.text = "cleared!"
+			resetDifficultText.x = display.contentCenterX
+		end		
+		local resetDifficultWordButton = widget.newButton(
+			{
+				label = "yes",
+				labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
+				onEvent = resettingDifficultHandler,
+				emboss = false,
+				shape = "rect",
+				width = 80,
+				height = 36,
+				cornerRadius = 2,
+				fillColor = { default={ 0.8, 0.4, 0.1, 0.5 }, over={ 0.8, 0.4, 0.1, 1 } },
+				strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+				strokeWidth = 1
+			}
+		)
+		resetDifficultWordButton.x, resetDifficultWordButton.y = display.contentCenterX + 70, display.contentHeight - 20
+
 	end
 	finishButton.isVisible = true
 end
@@ -461,13 +429,13 @@ function scene:create( event )
 		clockText.isVisible = false
 	end
 
-	scoreText = display.newText(backGroup, "excellent: " .. score, 50, display.contentHeight, native.systemFont, 14)
+	scoreText = display.newText(mainGroup, "excellent: " .. score, 50, display.contentHeight, native.systemFont, 14)
 	scoreText:setFillColor(0.8,0.4,0.1)
 
-	scoreGoodText = display.newText(backGroup, "good: " .. scoreGood, display.contentCenterX, display.contentHeight, native.systemFont, 14)
+	scoreGoodText = display.newText(mainGroup, "good: " .. scoreGood, display.contentCenterX, display.contentHeight, native.systemFont, 14)
 	scoreGoodText:setFillColor(0.8,0.4,0.1)
 
-	badScoreText = display.newText(backGroup, "bad: " .. badScore, display.contentWidth - 40, display.contentHeight, native.systemFont, 14)
+	badScoreText = display.newText(mainGroup, "bad: " .. badScore, display.contentWidth - 40, display.contentHeight, native.systemFont, 14)
 	badScoreText:setFillColor(0.8,0.4,0.1)
 
 	-- finishButton = display.newText( mainGroup, "Finish" , display.contentCenterX, 480, native.systemFont, 20 )	

@@ -34,7 +34,8 @@ local function buttonHandler( event )
 			composer.gotoScene("game", { params = {gameMode = "review", selectedCategory = ""}})
 		else
 			warningText.alpha = 1
-			transition.to(warningText, {time=1500, alpha= 0})
+			timer.performWithDelay( 1000, function() transition.to(warningText, {time=1500, alpha= 0}) end )
+			
 		end
 		
 	end

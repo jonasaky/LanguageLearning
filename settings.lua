@@ -15,7 +15,7 @@ local widget = require( "widget" )
 
 local musicTrack
 
-local defaultField
+local nickNameField
 
 local function textListener( event )
 
@@ -78,6 +78,13 @@ local function onSwitchPress( event )
 	settingsData.isVolumeOn = switch.isOn
 	loadsave.saveTable(settingsData, "settingsData.json")
 end
+
+local function resettingDifficultHandler(event)
+	loadsave.saveTable({}, "difficultWords.json")
+	local clearedText = display.newText(sceneGroup, "cleared!", display.contentCenterX, 370, "Segoe UI", 16)
+	clearedText:setFillColor(0.8,0.4,0.1)
+	transition.to(clearedText, { time = 1000, alpha = 0 })
+end
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -107,13 +114,13 @@ function scene:create( event )
 	
 	-- Create text field
 	local customFont = native.newFont( "CHOWFUN_.ttf", 16 )
-	defaultField = native.newTextField( display.contentCenterX, 150, 180, 30 )
-	-- defaultField.hasBackground = false
-	-- defaultField:setTextColor( 0.8, 0.8, 0.8 )
-	defaultField:addEventListener( "userInput", textListener )
-	defaultField.text = playerData.username
-	defaultField.font = customFont
-	sceneGroup:insert(defaultField)
+	nickNameField = native.newTextField( display.contentCenterX, 140, 180, 30 )
+	-- nickNameField.hasBackground = false
+	-- nickNameField:setTextColor( 0.8, 0.8, 0.8 )
+	nickNameField:addEventListener( "userInput", textListener )
+	nickNameField.text = playerData.username
+	nickNameField.font = customFont
+	sceneGroup:insert(nickNameField)
 
 	local volumeText = display.newText(sceneGroup, "Volume:", display.contentCenterX, 200, "CHOWFUN_.ttf", 24 )
 	volumeText:setFillColor(0.8,0.4,0.1)
@@ -131,7 +138,7 @@ function scene:create( event )
 	local onOffVolume = widget.newSwitch(
 		{
 			left = display.contentCenterX - 30,
-			top = 220,
+			top = 210,
 			style = "checkbox",
 			id = "volumeCheckbox",
 			width = 70,
@@ -144,6 +151,27 @@ function scene:create( event )
 		}
 	)
 	sceneGroup:insert(onOffVolume)
+
+	local resetDifficultText = display.newText(sceneGroup, "Clear the review words?", display.contentCenterX, 300, "CHOWFUN_.ttf", 24)
+	resetDifficultText:setFillColor(0.8,0.4,0.1)
+			
+	local resetDifficultWordButton = widget.newButton(
+		{
+			label = "Yes",
+			labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
+			onEvent = resettingDifficultHandler,
+			emboss = false,
+			shape = "rect",
+			width = 80,
+			height = 36,
+			cornerRadius = 2,
+			fillColor = { default={ 0.8, 0.4, 0.1, 0.5 }, over={ 0.8, 0.4, 0.1, 1 } },
+			strokeColor = { default={1,0.4,0,1}, over={0.8,0.8,1,1} },
+			strokeWidth = 1
+		}
+	)
+	resetDifficultWordButton.x, resetDifficultWordButton.y = display.contentCenterX, 340
+	sceneGroup:insert(resetDifficultWordButton)
 
 	-- local goBackButton = display.newText(sceneGroup, "Save changes", display.contentCenterX, display.contentHeight, "CHOWFUN_.ttf", 30)
 	-- goBackButton:setFillColor(0.8,0.4,0.1)
@@ -178,7 +206,7 @@ function scene:hide( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is on screen (but is about to go off screen)
-		display.remove(defaultField)
+		display.remove(nickNameField)
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
 		composer.removeScene( "settings" )
