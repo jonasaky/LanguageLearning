@@ -83,6 +83,7 @@ local function showFinalScore()
 				strokeWidth = 1
 			}
 		)
+		backGroup:insert(resetDifficultWordButton)
 		resetDifficultWordButton.x, resetDifficultWordButton.y = display.contentCenterX + 70, display.contentHeight - 20
 
 	end

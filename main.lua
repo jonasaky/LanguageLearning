@@ -75,7 +75,10 @@ local options = {
 }
 
 -- Schedule a notification to occur 60 seconds from now
-local notification1 = notifications.scheduleNotification( 60, options )
+local notification1 = notifications.scheduleNotification( 7200, options )
+local notification2 = notifications.scheduleNotification( 14400, options )
+local notification3 = notifications.scheduleNotification( 21600, options )
+local notification4 = notifications.scheduleNotification( 28800, options )
 
 -- Schedule a notification using Coordinated Universal Time (UTC)
 -- local utcTime = os.date( "!*t", os.time() + 60 )
