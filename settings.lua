@@ -8,6 +8,7 @@ playerData = loadsave.loadTable("playerData.json")
 settingsData = loadsave.loadTable("settingsData.json")
 
 local widget = require( "widget" )
+local notifications = require( "plugin.notifications.v2" )
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -58,6 +59,7 @@ local function buttonHandler( event )
 		event.target.yScale = 1
 
 		loadsave.saveTable(playerData, "playerData.json")
+		loadsave.saveTable(settingsData, "settingsData.json")
 		composer.gotoScene( "menu", { time=400, effect="zoomInOutFade" } )
 		
 	end
@@ -75,8 +77,30 @@ local function onSwitchPress( event )
 	else
 		audio.setVolume(0)
 	end
-	settingsData.isVolumeOn = switch.isOn
-	loadsave.saveTable(settingsData, "settingsData.json")
+	settingsData.isVolumeOn = switch.isOn	
+end
+
+local function onReminderSwitchPress( event )
+	local switch = event.target
+	print( "Switch with ID '"..switch.id.."' is on: "..tostring(switch.isOn) )
+	if (switch.isOn) then
+		print("activating reminders manually by settings")		
+		local options = {
+			alert = "This is daily reminder!"
+		}
+		local utcTime = os.date( "!*t" )
+		for i = 1, 7 do
+			utcTime.day = utcTime.day + i
+			notifications.scheduleNotification( utcTime, options )
+		end
+		-- for k,v in pairs(utcTime) do
+		-- 	print( k,v )
+		-- end
+	else
+		print("cancelling all reminders")
+		notifications.cancelNotification()
+	end
+	settingsData.isReminderOn = switch.isOn	
 end
 
 local function resettingDifficultHandler(event)
@@ -109,12 +133,12 @@ function scene:create( event )
 	local settingsText = display.newImageRect(sceneGroup, "title_settings.png", 156,53)
 	settingsText.x = display.contentCenterX
 
-	local nickNameLabel = display.newText(sceneGroup, "Your nickname:", display.contentCenterX, 100, "CHOWFUN_.ttf", 24)
+	local nickNameLabel = display.newText(sceneGroup, "Your nickname:", display.contentCenterX, 50, "CHOWFUN_.ttf", 24)
 	nickNameLabel:setFillColor(0.8,0.4,0.1)
 	
 	-- Create text field
 	local customFont = native.newFont( "CHOWFUN_.ttf", 16 )
-	nickNameField = native.newTextField( display.contentCenterX, 140, 180, 30 )
+	nickNameField = native.newTextField( display.contentCenterX, 90, 180, 30 )
 	-- nickNameField.hasBackground = false
 	-- nickNameField:setTextColor( 0.8, 0.8, 0.8 )
 	nickNameField:addEventListener( "userInput", textListener )
@@ -122,7 +146,7 @@ function scene:create( event )
 	nickNameField.font = customFont
 	sceneGroup:insert(nickNameField)
 
-	local volumeText = display.newText(sceneGroup, "Volume:", display.contentCenterX, 200, "CHOWFUN_.ttf", 24 )
+	local volumeText = display.newText(sceneGroup, "Volume:", display.contentCenterX, 150, "CHOWFUN_.ttf", 24 )
 	volumeText:setFillColor(0.8,0.4,0.1)
 	
 	-- Image sheet options and declaration
@@ -138,7 +162,7 @@ function scene:create( event )
 	local onOffVolume = widget.newSwitch(
 		{
 			left = display.contentCenterX - 30,
-			top = 210,
+			top = 160,
 			style = "checkbox",
 			id = "volumeCheckbox",
 			width = 70,
@@ -152,7 +176,7 @@ function scene:create( event )
 	)
 	sceneGroup:insert(onOffVolume)
 
-	local resetDifficultText = display.newText(sceneGroup, "Clear the review words?", display.contentCenterX, 300, "CHOWFUN_.ttf", 24)
+	local resetDifficultText = display.newText(sceneGroup, "Clear the review words?", display.contentCenterX, 250, "CHOWFUN_.ttf", 24)
 	resetDifficultText:setFillColor(0.8,0.4,0.1)
 			
 	local resetDifficultWordButton = widget.newButton(
@@ -170,8 +194,28 @@ function scene:create( event )
 			strokeWidth = 1
 		}
 	)
-	resetDifficultWordButton.x, resetDifficultWordButton.y = display.contentCenterX, 340
+	resetDifficultWordButton.x, resetDifficultWordButton.y = display.contentCenterX, 290
 	sceneGroup:insert(resetDifficultWordButton)
+
+	local dailyReminderText = display.newText(sceneGroup, "Daily reminder?", display.contentCenterX, 350, "CHOWFUN_.ttf", 24)
+	dailyReminderText:setFillColor(0.8,0.4,0.1)
+
+	local onOffReminder = widget.newSwitch(
+		{
+			left = display.contentCenterX - 30,
+			top = 360,
+			style = "checkbox",
+			id = "reminderCheckbox",
+			width = 70,
+			height = 70,
+			frameOff = 1,
+			frameOn = 2,
+			onPress = onReminderSwitchPress,
+			sheet = checkboxSheet,
+			initialSwitchState = settingsData.isReminderOn 
+		}
+	)
+	sceneGroup:insert(onOffReminder)
 
 	-- local goBackButton = display.newText(sceneGroup, "Save changes", display.contentCenterX, display.contentHeight, "CHOWFUN_.ttf", 30)
 	-- goBackButton:setFillColor(0.8,0.4,0.1)

@@ -35,6 +35,7 @@ end
 if(settingsData == nil) then
 	settingsData = {}
 	settingsData["isVolumeOn"] = true
+	settingsData["isReminderOn"] = true
 	loadsave.saveTable(settingsData, "settingsData.json")
 elseif not settingsData.isVolumeOn then
 	audio.setVolume(0)
@@ -74,11 +75,19 @@ local options = {
     custom = { foo = "bar" }
 }
 
+if settingsData ~= nil then
+	if settingsData.isReminderOn then
+		notifications.cancelNotification()
+		local utcTime = os.date( "!*t" )
+		for i = 1, 7 do
+			utcTime.day = utcTime.day + i
+			notifications.scheduleNotification( utcTime, options )
+		end
+	end
+end
+
 -- Schedule a notification to occur 60 seconds from now
-local notification1 = notifications.scheduleNotification( 7200, options )
-local notification2 = notifications.scheduleNotification( 14400, options )
-local notification3 = notifications.scheduleNotification( 21600, options )
-local notification4 = notifications.scheduleNotification( 28800, options )
+-- local notification1 = notifications.scheduleNotification( 7200, options )
 
 -- Schedule a notification using Coordinated Universal Time (UTC)
 -- local utcTime = os.date( "!*t", os.time() + 60 )
