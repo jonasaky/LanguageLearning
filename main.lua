@@ -64,6 +64,44 @@ local function onKeyEvent( event )
 end
 Runtime:addEventListener( "key", onKeyEvent );
 
+local function printTable( t )
+ 
+    local printTable_cache = {}
+ 
+    local function sub_printTable( t, indent )
+ 
+        if ( printTable_cache[tostring(t)] ) then
+            print( indent .. "*" .. tostring(t) )
+        else
+            printTable_cache[tostring(t)] = true
+            if ( type( t ) == "table" ) then
+                for pos,val in pairs( t ) do
+                    if ( type(val) == "table" ) then
+                        print( indent .. "[" .. pos .. "] => " .. tostring( t ).. " {" )
+                        sub_printTable( val, indent .. string.rep( " ", string.len(pos)+8 ) )
+                        print( indent .. string.rep( " ", string.len(pos)+6 ) .. "}" )
+                    elseif ( type(val) == "string" ) then
+                        print( indent .. "[" .. pos .. '] => "' .. val .. '"' )
+                    else
+                        print( indent .. "[" .. pos .. "] => " .. tostring(val) )
+                    end
+                end
+            else
+                print( indent..tostring(t) )
+            end
+        end
+    end
+ 
+    if ( type(t) == "table" ) then
+        print( tostring(t) .. " {" )
+        sub_printTable( t, "  " )
+        print( "}" )
+    else
+        sub_printTable( t, "  " )
+    end
+end
+table.print = printTable
+
 -- Get the app's launch arguments in case it was started when the user tapped on a notification
 local launchArgs = ...
 
@@ -78,11 +116,11 @@ local options = {
 if settingsData ~= nil then
 	if settingsData.isReminderOn then
 		notifications.cancelNotification()
-		local utcTime = os.date( "!*t" )
+		local utcTime
 		for i = 1, 7 do
-			utcTime.day = utcTime.day + i
+			utcTime = os.date( "!*t", os.time() + 24*60*60*i )
 			notifications.scheduleNotification( utcTime, options )
-		end
+		end				
 	end
 end
 
